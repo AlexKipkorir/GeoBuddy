@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:background="@drawable/background_gradient"
+    android:padding="16dp">
+
+    <ImageView
+        android:id="@+id/logoImgLogo"
+        android:layout_width="197dp"
+        android:layout_height="163dp"
+        android:contentDescription="@string/geobuddy_logo"
+        android:src="@drawable/geobuddy_logo" />
+
+    <!--    <Button-->
+<!--        android:id="@+id/btnLogin"-->
+<!--        android:layout_width="275dp"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="@string/login" />-->
+
+<!--    <Button-->
+<!--        android:id="@+id/btnSignup"-->
+<!--        android:layout_width="283dp"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginTop="16dp"-->
+<!--        android:text="@string/signup" />-->
+
+</LinearLayout>
+

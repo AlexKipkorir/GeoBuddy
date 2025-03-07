@@ -1,0 +1,37 @@
+<resources>
+    <string name="app_name">GeoBuddy</string>
+    <string name="login">Login</string>
+    <string name="signup">signup</string>
+    <string name="geobuddy_logo">GeoBuddy Logo</string>
+    <string name="GeoBuddy_logo">GeoBuddy Logo</string>
+    <string name="email">Enter Your Email</string>
+    <string name="password">Enter Your Password</string>
+    <string name="sign_in_to_your_account">Sign in to your account</string>
+    <string name="emails">Email</string>
+    <string name="passwords">Password</string>
+    <string name="or_sign_in_with">-----------OR SIGN IN WITH------------</string>
+    <string name="don_t_have_an_account">Don\'t have an account?</string>
+    <string name="forgot_password">Forgot Password?</string>
+    <string name="sign_in">SIGN IN</string>
+    <string name="sign_up">Sign up</string>
+    <string name="google_sign_in">Google Sign-In</string>
+    <string name="separator">|</string>"
+    <string name="welcome">Welcome To</string>
+    <string name="create_your_account">Create your Account</string>"
+    <string name="firstname">First Name</string>
+    <string name="Firstname">Enter Your First Name</string>
+    <string name="lastname">Last Name</string>
+    <string name="Lastname">Enter your last name</string>
+    <string name="Sign_up">SIGN UP</string>
+    <string name="already_have_an_account">Already have an account? Sign In</string>">
+    <string name="confirm_password">Confirm Password</string>
+    <string name="terms_and_condition">I agree to the Terms and Conditions</string>
+    <string name="text">text</string>"
+    <string name="reset_password">Reset Password</string>
+    <string name="send_reset_link">Send Reset Link</string>
+    <string name="back_to_login">Back to Login</string>"
+    <string name="Enter_otp_sent_to_email">"Enter OTP sent to your email</string>
+    <string name="Enter_6_digit_otp">Enter 6-digit OTP</string>
+    <string name="verify_otp">Verify OTP</string>
+    <string name="resend_otp">Resend OTP</string>
+</resources>

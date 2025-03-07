@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "28271850600",
+    "project_id": "geobuddy-86401",
+    "storage_bucket": "geobuddy-86401.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:28271850600:android:a75a9f0ab5d62e3aceb7dd",
+        "android_client_info": {
+          "package_name": "com.example.geobuddy"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAPEnRqumg05Qvn-vnNPeKDco2izE_BDpY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

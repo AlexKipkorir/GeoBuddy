@@ -20,6 +20,7 @@ class OTPVerificationActivity : AppCompatActivity() {
     private lateinit var resendOtpText: TextView
     private lateinit var apiService: RetrofitService // Dummy Retrofit API
 
+    // Initialize views and set click listeners
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_otp_verification)
@@ -44,27 +45,41 @@ class OTPVerificationActivity : AppCompatActivity() {
             sendOTP(email)
         }
     }
+
+    // Function to send OTP
     private fun sendOTP(email: String) {
-        val request = OtpRequest(email) // Create a request object
+        val request = OtpRequest(email)
         val call = apiService.sendOtp(request)
+
         call.enqueue(object : Callback<ApiResponse> {
+            // Handle successful response
             override fun onResponse(call: Call<ApiResponse>, response: Response<ApiResponse>) {
-                Toast.makeText(this@OTPVerificationActivity, "OTP sent successfully", Toast.LENGTH_SHORT).show()
+                if (response.isSuccessful) {
+                    Toast.makeText(this@OTPVerificationActivity, "OTP sent successfully", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(this@OTPVerificationActivity, "Error: ${response.code()}", Toast.LENGTH_SHORT).show()
+                }
             }
+            // Handle failure
             override fun onFailure(call: Call<ApiResponse>, t: Throwable) {
-                Toast.makeText(this@OTPVerificationActivity, "Failed to send OTP", Toast.LENGTH_SHORT).show()
+                val errorMessage = "Failed to send OTP: ${t.message}"
+                Toast.makeText(this@OTPVerificationActivity, errorMessage, Toast.LENGTH_LONG).show()
+                android.util.Log.e("OTPVerification", errorMessage, t)  // Logs error to Logcat
             }
         })
     }
+
+    // Function to verify OTP
     private fun verifyOTP(email: String, otp: String) {
         val request = OtpVerificationRequest(email, otp) // Create a verification request object
         val call = apiService.verifyOtp(request)
 
         call.enqueue(object : Callback<ApiResponse> {
+            // Handle successful response
             override fun onResponse(call: Call<ApiResponse>, response: Response<ApiResponse>) {
                 if (response.isSuccessful) {
                     Toast.makeText(this@OTPVerificationActivity, "OTP Verified", Toast.LENGTH_SHORT).show()
-                    val intent = Intent(this@OTPVerificationActivity, MainActivity::class.java)
+                    val intent = Intent(this@OTPVerificationActivity, DashboardActivity::class.java)
                     startActivity(intent)
                     finish()
                 } else {
@@ -72,6 +87,7 @@ class OTPVerificationActivity : AppCompatActivity() {
                 }
             }
 
+            // Handle failure
             override fun onFailure(call: Call<ApiResponse>, t: Throwable) {
                 Toast.makeText(this@OTPVerificationActivity, "Verification Failed", Toast.LENGTH_SHORT).show()
             }

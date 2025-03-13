@@ -1,6 +1,296 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent">
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:autofillHints=""
+    tools:context=".TrackerRegistrationActivity" >
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp" >
+
+    <!--Project Logo-->
+    <ImageView
+        android:id="@+id/logoImgLogo"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@drawable/geobuddy_logo"
+        android:contentDescription="@string/GeoBuddy_logo"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="20dp"
+        />
+    <!--Title -->
+    <TextView
+        android:id="@+id/titleTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/register_your_tracker"
+        android:textSize="20sp"
+        android:textAlignment="center"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@+id/logoImgLogo"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+    
+    <!--Dropdown Menu for Type Selection-->
+    <Spinner
+        android:id="@+id/categorySpinner"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:entries="@array/tracker_types"
+        android:minHeight="48dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/titleTextView"
+        android:layout_marginTop="16dp"/>
+
+
+        <!--Luggage Section -->
+        <LinearLayout
+            android:id="@+id/layoutFields"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintTop_toBottomOf="@+id/categorySpinner"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="16dp" >
+
+            <EditText
+                android:id="@+id/luggageNameInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:autofillHints=""
+                android:hint="@string/enter_lugggage_type"
+                android:inputType="text"
+                android:visibility="gone"
+                app:layout_constraintTop_toBottomOf="@+id/layoutLuggage"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginTop="16dp"/>
+            <EditText
+                android:id="@+id/colorInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:autofillHints=""
+                android:hint="@string/enter_luggage_color"
+                android:inputType="text"
+                android:visibility="gone"
+                app:layout_constraintTop_toBottomOf="@+id/luggageNameInput"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="16dp" />
+            <EditText
+                android:id="@+id/luggageDescriptionInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:autofillHints=""
+                android:hint="@string/enter_luggage_description"
+                android:inputType="text"
+                android:visibility="gone"
+                app:layout_constraintTop_toBottomOf="@+id/colorInput"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginTop="16dp" />
+
+         <!--Fields for Pet-->
+            <EditText
+                android:id="@+id/petNameInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:autofillHints=""
+                android:hint="@string/enter_pet_name"
+                android:inputType="textPersonName"
+                android:visibility="gone"
+                app:layout_constraintTop_toBottomOf="@+id/layoutFields"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="16dp" />
+            <EditText
+                android:id="@+id/breedInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:autofillHints=""
+                android:hint="@string/enter_pet_breed"
+                android:inputType="text"
+                android:visibility="gone"
+                app:layout_constraintTop_toBottomOf="@+id/petNameInput"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="16dp" />
+            <EditText
+                android:id="@+id/petAgeInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:autofillHints=""
+                android:hint="@string/enter_pet_age"
+                android:inputType="text|number"
+                android:visibility="gone"
+                app:layout_constraintTop_toBottomOf="@id/breedInput"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginTop="16dp" />
+            <EditText
+                android:id="@+id/petDescriptionInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:autofillHints=""
+                android:hint="@string/enter_pet_description"
+                android:visibility="gone"
+                app:layout_constraintTop_toBottomOf="@+id/petAgeInput"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginTop="16dp" />
+
+           <!--Fields for Children-->
+            <EditText
+               android:id="@+id/childNameInput"
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:autofillHints=""
+               android:hint="@string/enter_child_name"
+               android:inputType="textPersonName"
+               android:visibility="gone"
+               app:layout_constraintTop_toBottomOf="@+id/layoutFields"
+               app:layout_constraintStart_toStartOf="parent"
+               app:layout_constraintEnd_toEndOf="parent"
+               android:layout_marginTop="16dp" />
+            <EditText
+               android:id="@+id/childAgeInput"
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:autofillHints=""
+               android:hint="@string/enter_child_age"
+               android:inputType="text"
+               android:visibility="gone"
+               app:layout_constraintTop_toBottomOf="@+id/childNameInput"
+               app:layout_constraintEnd_toEndOf="parent"
+               app:layout_constraintStart_toStartOf="parent"
+               android:layout_marginTop="16dp" />
+            <EditText
+               android:id="@+id/childDescriptionInput"
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:autofillHints="" android:hint="@string/enter_child_description"
+               android:inputType="text"
+               android:visibility="gone"
+               app:layout_constraintTop_toBottomOf="@+id/childAgeInput"
+               app:layout_constraintEnd_toEndOf="parent"
+               app:layout_constraintStart_toStartOf="parent"
+               android:layout_marginTop="16dp" />
+         </LinearLayout>
+
+
+         <!--Image Upload-->
+        <Button
+            android:id="@+id/uploadImageButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/upload_image_button"
+            android:background="@drawable/background_gradient"
+            app:layout_constraintTop_toBottomOf="@+id/layoutFields"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="10dp" />
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:layout_weight="1"
+            android:scaleType="fitCenter"
+            android:adjustViewBounds="true"
+            android:autofillHints=""
+            android:contentDescription="@string/todo"
+            android:inputType=""
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@+id/uploadImageButton"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+        <Button
+            android:id="@+id/removeImageButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/remove_image"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@id/imageView"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    <!--Tracker Name Input -->
+        <EditText
+            android:id="@+id/trackerNameInput"
+            android:layout_width="308dp"
+            android:layout_height="48dp"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginTop="20dp"
+            android:autofillHints=""
+            android:hint="@string/enter_tracker_name"
+            android:inputType="text"
+            android:minHeight="48dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/removeImageButton" />
+
+    <!--IMEI Number Input-->
+        <EditText
+            android:id="@+id/imeiInput"
+            android:layout_width="307dp"
+            android:layout_height="48dp"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginTop="20dp"
+            android:autofillHints=""
+            android:hint="@string/enter_imei_number"
+            android:inputType="numberDecimal"
+            android:minHeight="48dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/trackerNameInput" />
+
+    <!--Status Indicator-->
+        <TextView
+            android:id="@+id/statusIndicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="36dp"
+            android:text="@string/status"
+            android:textColor="@android:color/holo_red_dark"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.52"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/imeiInput" />
+
+
+    <!--Save Button-->
+
+        <!--Proceed to Map Button-->
+
+        <Button
+            android:id="@+id/registerTrackerButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="44dp"
+            android:background="@drawable/background_gradient"
+            android:text="@string/register_tracker"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.56"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/statusIndicator" />
+
+        <Button
+            android:id="@+id/proceedToMapButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/go_to_tracking_map"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@+id/registerTrackerButton"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+
+      </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

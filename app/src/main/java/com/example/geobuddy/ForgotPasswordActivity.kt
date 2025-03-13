@@ -51,6 +51,8 @@ class ForgotPasswordActivity : AppCompatActivity() {
         }
 
     }
+
+    //Function to send password reset email
     private fun sendPasswordResetEmail(email: String) {
         auth.sendPasswordResetEmail(email)
             .addOnCompleteListener { task ->

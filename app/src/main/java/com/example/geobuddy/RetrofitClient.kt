@@ -4,7 +4,8 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitClient {
-    private const val BASE_URL = "https://dummy.api.com" //I will replace later
+
+    private const val BASE_URL = "https://run.mocky.io/v3/" //I will replace later
 
     val instance: Retrofit by lazy {
         Retrofit.Builder()

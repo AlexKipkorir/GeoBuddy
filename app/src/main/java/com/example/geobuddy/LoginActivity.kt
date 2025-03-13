@@ -54,6 +54,8 @@ class LoginActivity : AppCompatActivity() {
             startActivity(intent)
         }
     }
+
+    //Function to sign in user
     private fun signInUser(email: String,password: String) {
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->

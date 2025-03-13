@@ -6,9 +6,9 @@ import retrofit2.http.Body
 import retrofit2.http.POST
 
 interface RetrofitService {
-    @POST("send_otp")
+    @POST("ea33cd0f-9310-40c0-a766-8eaddebea162")
    fun sendOtp(@Body request: OtpRequest): Call<ApiResponse>
 
-    @POST("verify_otp")
+    @POST("413ecae1-c537-4606-a732-a856acd6686a")
    fun verifyOtp(@Body request: OtpVerificationRequest): Call<ApiResponse>
 }

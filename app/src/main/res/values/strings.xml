@@ -34,4 +34,27 @@
     <string name="Enter_6_digit_otp">Enter 6-digit OTP</string>
     <string name="verify_otp">Verify OTP</string>
     <string name="resend_otp">Resend OTP</string>
+    <string name="upload_image_button">Upload Image</string>
+    <string name="enter_tracker_name">Enter Tracker Name</string>
+    <string name="enter_imei_number">Enter IMEI Number</string>
+    <string name="register_tracker">Register Tracker</string>
+    <string name="tracker_name">Tracker Name</string>"
+    <string name="go_to_tracking_map">Go to Tracking Map</string>
+    <string name="status">Status: Offline</string>
+    <string name="register_your_tracker">Register Your Tracker</string>
+    <string name="image_view">Image View</string>
+    <string name="Enter_name">enter_name</string>
+    <string name="enter_pet_breed">Enter Pet Breed</string>
+    <string name="enter_child_age">Enter Child Age</string>
+    <string name="enter_child_description">Enter Child Description</string>
+    <string name="enter_child_name">Enter Child Name</string>
+    <string name="enter_luggage_color">Enter Luggage Color</string>
+    <string name="enter_luggage_description">Enter Luggage Description</string>
+    <string name="enter_pet_name">Enter Pet Name</string>
+    <string name="enter_pet_age">Enter Pet Age</string>
+    <string name="enter_pet_description">Enter Pet Description</string>
+    <string name="todo">TODO</string>
+    <string name="enter_lugggage_type">Enter Lugggage Type</string>
+    <string name="remove_image">Remove Image</string>
+
 </resources>

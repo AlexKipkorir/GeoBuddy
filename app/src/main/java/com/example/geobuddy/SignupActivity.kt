@@ -9,6 +9,7 @@ import com.google.firebase.auth.FirebaseAuth
 class SignupActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
 
+    //Initialize Views
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_signup)
@@ -68,6 +69,7 @@ class SignupActivity : AppCompatActivity() {
 
     }
 
+    //Function to sign up user
     private fun signUpUser(email: String, password: String) {
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->

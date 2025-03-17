@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.Spinner
 import androidx.appcompat.app.AppCompatActivity
@@ -23,6 +24,8 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import android.content.Intent
+import android.util.Log
 
 class DashboardActivity : AppCompatActivity(), OnMapReadyCallback {
 
@@ -30,6 +33,7 @@ class DashboardActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var trackerSpinner: Spinner
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var findMeButton: FloatingActionButton
+    private lateinit var addTrackerButton: FloatingActionButton
     private val markers = mutableListOf<Marker>()
 
     // Dummy tracker data (around Nairobi)
@@ -43,11 +47,20 @@ class DashboardActivity : AppCompatActivity(), OnMapReadyCallback {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_dashboard)
 
+        addTrackerButton = findViewById(R.id.addTrackerButton)
+
+        // Navigate To Tracker Registration Page
+        addTrackerButton.setOnClickListener {
+            val intent = Intent(this, TrackerRegistrationActivity::class.java)
+            startActivity(intent)
+        }
+        // Initialize FusedLocationProviderClient
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
         // Initialize Map
         val mapFragment = supportFragmentManager.findFragmentById(R.id.mapFragment) as SupportMapFragment
         mapFragment.getMapAsync(this)
+
 
         // Set up tracker dropdown
         trackerSpinner = findViewById(R.id.trackerSpinner)
@@ -79,11 +92,16 @@ class DashboardActivity : AppCompatActivity(), OnMapReadyCallback {
         // Find Me Button
         findMeButton = findViewById(R.id.findMeButton)
         findMeButton.setOnClickListener {
+            if (::googleMap.isInitialized) {
             findUserLocation()
+            } else {
+                Log.e("DashboardActivity", "Google Map is not initialized.")
+            }
         }
     }
 
     override fun onMapReady(map: GoogleMap) {
+        Log.d("DashboardActivity", "onMapReady called")
         googleMap = map
         googleMap.uiSettings.isZoomControlsEnabled = true
 
@@ -109,8 +127,15 @@ class DashboardActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
+
+
     // Move the map to the user's current location
     private fun findUserLocation() {
+        if (!::googleMap.isInitialized) {
+            Log.e("DashboardActivity", "Google Map is not initialized.")
+            return
+        }
+
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
                 location?.let {
@@ -125,3 +150,4 @@ class DashboardActivity : AppCompatActivity(), OnMapReadyCallback {
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1001
     }
 }
+

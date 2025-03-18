@@ -323,6 +323,8 @@ class TrackerRegistrationActivity : AppCompatActivity() {
 
     // Function to save the tracker to Firestore
     private fun saveTrackerToFirestore(userId: String, trackerName: String, imei: String, category: String, imageUrl: String?) {
+        Log.d("TrackerRegistration", "Saving tracker: userId=$userId, trackerName=$trackerName, imei=$imei, category=$category, imageUrl=$imageUrl")
+
         val trackerData = hashMapOf(
             "name" to trackerName,
             "imei" to imei,
@@ -344,4 +346,5 @@ class TrackerRegistrationActivity : AppCompatActivity() {
                 Toast.makeText(this, "Failed to register tracker", Toast.LENGTH_SHORT).show()
             }
     }
+
 }

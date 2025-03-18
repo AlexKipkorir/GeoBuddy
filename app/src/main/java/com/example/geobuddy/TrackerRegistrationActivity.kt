@@ -1,13 +1,17 @@
 package com.example.geobuddy
 
+import android.app.Activity
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.View
+import android.view.animation.DecelerateInterpolator
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Button
@@ -15,22 +19,17 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Spinner
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.storage.FirebaseStorage
-import java.util.UUID
-import android.view.animation.DecelerateInterpolator
-import android.widget.TextView
-import androidx.compose.animation.core.animate
-import android.graphics.Color
-import android.os.Build
-import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
+import java.util.UUID
 
 private const val CHANNEL_ID = "tracker_status_channel"
 private const val NOTIFICATION_ID = 1
@@ -333,18 +332,51 @@ class TrackerRegistrationActivity : AppCompatActivity() {
             "status" to "Active",
             "registeredAt" to FieldValue.serverTimestamp()
         )
-        db.collection("users").document(userId).collection("trackers")
-            .add(trackerData)
-            .addOnSuccessListener { documentReference ->
-                Log.d("TrackerRegistration", "Tracker registered successfully with ID: ${documentReference.id}")
-                Toast.makeText(this, "Tracker registered successfully", Toast.LENGTH_SHORT).show()
-                startActivity(Intent(this, DashboardActivity::class.java))
-                finish()
+        // Ensure the user document exists
+        val userRef = db.collection("users").document(userId)
+        userRef.get().addOnSuccessListener { document ->
+            if (document.exists()) {
+                // User document exists, add the tracker
+                userRef.collection("trackers")
+                    .add(trackerData)
+                    .addOnSuccessListener { documentReference ->
+                        Log.d("TrackerRegistration", "Tracker added with ID: ${documentReference.id}")
+                        Toast.makeText(this, "Tracker registered successfully", Toast.LENGTH_SHORT).show()
+                        startActivity(Intent(this, DashboardActivity::class.java))
+                        finish()
+                    }
+                    .addOnFailureListener { e ->
+                        Log.e("TrackerRegistration", "Error adding tracker", e)
+                        Toast.makeText(this, "Failed to register tracker", Toast.LENGTH_SHORT).show()
+                    }
+            } else {
+                // User document does not exist, create it first
+                userRef.set(hashMapOf("createdAt" to FieldValue.serverTimestamp()))
+                    .addOnSuccessListener {
+                        // Now add the tracker
+                        userRef.collection("trackers")
+                            .add(trackerData)
+                            .addOnSuccessListener { documentReference ->
+                             Log.d("TrackerRegistration", "Tracker added with ID: ${documentReference.id}")
+                             Toast.makeText(this, "Tracker registered successfully", Toast.LENGTH_SHORT).show()
+                             startActivity(Intent(this, DashboardActivity::class.java))
+                             finish()
+                            }
+                            .addOnFailureListener { e ->
+                                Log.e("TrackerRegistration", "Error adding tracker", e)
+                                Toast.makeText(this, "Failed to register tracker", Toast.LENGTH_SHORT).show()
+                            }
+                    }
+                    .addOnFailureListener { e ->
+                        Log.e("TrackerRegistration", "Error creating user document", e)
+                        Toast.makeText(this, "Failed to register tracker", Toast.LENGTH_SHORT).show()
+
+                    }
             }
-            .addOnFailureListener { e ->
-                Log.e("TrackerRegistration", "Failed to register tracker", e)
-                Toast.makeText(this, "Failed to register tracker", Toast.LENGTH_SHORT).show()
-            }
+        }.addOnFailureListener { e ->
+            Log.e("TrackerRegistration", "Error checking user document", e)
+            Toast.makeText(this, "Failed to register tracker", Toast.LENGTH_SHORT).show()
+        }
     }
 
 }

@@ -72,6 +72,7 @@ dependencies {
     implementation(libs.firebase.analytics.ktx)
 //    implementation(libs.firebase.dynamic.module.support)
     implementation(libs.firebase.messaging)
+    implementation(libs.firebase.storage)
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
     implementation(libs.logging.interceptor)

@@ -39,7 +39,7 @@ class DashboardActivity : AppCompatActivity(), OnMapReadyCallback {
     // Dummy tracker data (around Nairobi)
     private val trackers = listOf(
         Tracker("Tracker 1", "Active", "80%", -1.2921, 36.8219),
-        Tracker("Tracker 2", "Offline", "50%", -1.3000, 36.8233),
+        Tracker("Tracker 2", "Offline", "50%", -0.1678025162622931, 35.96421574323334),
         Tracker("Tracker 3", "Active", "90%", -1.3100, 36.8050)
     )
 

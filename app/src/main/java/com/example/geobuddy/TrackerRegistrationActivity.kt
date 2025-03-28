@@ -93,10 +93,10 @@ class TrackerRegistrationActivity : AppCompatActivity() {
         removeImageButton.setOnClickListener {
             removeSelectedImage()
         }
-        registerTrackerButton.setOnClickListener{
-            registerTracker()
-        }
+
         registerTrackerButton.setOnClickListener {
+            Log.d("TrackerRegistrationActivity", "Button clicked: Register Tracker")
+
             val imei = imeiInput.text.toString().trim()
 
             if (imei.isEmpty()) {
@@ -106,6 +106,8 @@ class TrackerRegistrationActivity : AppCompatActivity() {
             } else {
                 checkTrackerStatus(imei,statusIndicator)
             }
+
+            registerTracker()
         }
 
     }
@@ -152,6 +154,7 @@ class TrackerRegistrationActivity : AppCompatActivity() {
             notify(NOTIFICATION_ID, builder.build())
         }
     }
+    // Handle permission request result
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -286,97 +289,112 @@ class TrackerRegistrationActivity : AppCompatActivity() {
         }
     }
 
-    // Function to register the tracker
+    // Function For Save Tracker Button
     private fun registerTracker() {
+        Log.d("TrackerRegistrationActivity", "Function called: registerTracker")
+
         val userId = auth.currentUser?.uid ?: return
+        Log.d("TrackerRegistrationActivity", "User ID retrieved: $userId")
+
         val trackerName = trackerNameInput.text.toString().trim()
         val imei = imeiInput.text.toString().trim()
         val category = categorySpinner.selectedItem.toString().trim()
 
-        if (trackerName.isEmpty() || imei.isEmpty() || imageUri == null) {
+        if (trackerName.isEmpty() || imei.isEmpty() || category.isEmpty()) {
+            Log.e("TrackerRegistrationActivity", "Validation failed: Missing fields")
             Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show()
             return
         }
+        Log.d("TrackerRegistrationActivity", "Checking if user has reached max trackers limit")
+
         val maxTrackersAllowed = 5
-        db.collection("users").document(userId).collection("trackers").get()
+        db.collection("trackers").whereEqualTo("userId", userId).get()
             .addOnSuccessListener { documents ->
+                Log.d("TrackerRegistrationActivity", "Tracker count retrieved: ${documents.size()}")
+
                 if (documents.size() >= maxTrackersAllowed) {
-                    Toast.makeText(this, "Maximum number of trackers reached", Toast.LENGTH_SHORT).show()
+                    Log.e("TrackerRegistrationActivity", "Maximum trackers reached")
+                    Toast.makeText(this, "Maximum trackers reached", Toast.LENGTH_SHORT).show()
+                    sendNotification(this,"Registration Failed","Maximum trackers reached")
                     return@addOnSuccessListener
                 }
-                imageUri?.let { uri ->
+
+                imageUri?.let { uri: Uri ->
+                    Log.d("TrackerRegistrationActivity", "Uploading image...")
+
                     val imageRef = storage.child("tracker_images/${UUID.randomUUID()}.jpg")
                     imageRef.putFile(uri)
                         .addOnSuccessListener { _ ->
+                            Log.d("TrackerRegistrationActivity", "Image uploaded successfully")
+
                             imageRef.downloadUrl.addOnSuccessListener { imageUrl ->
+                                Log.d("TrackerRegistrationActivity", "Image URL retrieved: $imageUrl")
                                 saveTrackerToFirestore(userId, trackerName, imei, category, imageUrl.toString())
                             }
                         }
-                        .addOnFailureListener {
+                        .addOnFailureListener { e ->
+                            Log.e("TrackerRegistrationActivity", "Failed to upload image", e)
                             Toast.makeText(this, "Failed to upload image", Toast.LENGTH_SHORT).show()
                         }
 
-                } ?: saveTrackerToFirestore(userId, trackerName, imei, category, null)
-            }
-    }
+                } ?: run{
+                    Log.d("TrackerRegistrationActivity", "No image selected, saving tracker without image")
+                    saveTrackerToFirestore(userId, trackerName, imei, category, null)
 
-    // Function to save the tracker to Firestore
+                }
+
+            }
+            .addOnFailureListener { e ->
+                Log.e("TrackerRegistrationActivity", "Failed to retrieve tracker count", e)
+            }
+
+
+    }
+    // Save tracker to Firestore
     private fun saveTrackerToFirestore(userId: String, trackerName: String, imei: String, category: String, imageUrl: String?) {
-        Log.d("TrackerRegistration", "Saving tracker: userId=$userId, trackerName=$trackerName, imei=$imei, category=$category, imageUrl=$imageUrl")
+        Log.d("TrackerRegistrationActivity", "Function called: saveTrackerToFirestore")
+        Log.d("TrackerRegistrationActivity", "Saving tracker to Firestore: userId=$userId, trackerName=$trackerName, imei=$imei, category=$category, imageUrl=$imageUrl")
 
         val trackerData = hashMapOf(
-            "name" to trackerName,
+            "userId" to userId,
+            "trackerName" to trackerName,
             "imei" to imei,
-            "category" to category,
+            "trackerType" to category,
             "imageUrl" to (imageUrl ?: ""),
-            "status" to "Active",
-            "registeredAt" to FieldValue.serverTimestamp()
+            "trackerStatus" to "Active",
+            "latitude" to 0.0,
+            "longitude" to 0.0,
+            "battery" to "100%",
+            "createdAt" to FieldValue.serverTimestamp()
         )
-        // Ensure the user document exists
-        val userRef = db.collection("users").document(userId)
-        userRef.get().addOnSuccessListener { document ->
-            if (document.exists()) {
-                // User document exists, add the tracker
-                userRef.collection("trackers")
-                    .add(trackerData)
-                    .addOnSuccessListener { documentReference ->
-                        Log.d("TrackerRegistration", "Tracker added with ID: ${documentReference.id}")
-                        Toast.makeText(this, "Tracker registered successfully", Toast.LENGTH_SHORT).show()
-                        startActivity(Intent(this, DashboardActivity::class.java))
-                        finish()
-                    }
-                    .addOnFailureListener { e ->
-                        Log.e("TrackerRegistration", "Error adding tracker", e)
-                        Toast.makeText(this, "Failed to register tracker", Toast.LENGTH_SHORT).show()
-                    }
-            } else {
-                // User document does not exist, create it first
-                userRef.set(hashMapOf("createdAt" to FieldValue.serverTimestamp()))
-                    .addOnSuccessListener {
-                        // Now add the tracker
-                        userRef.collection("trackers")
-                            .add(trackerData)
-                            .addOnSuccessListener { documentReference ->
-                             Log.d("TrackerRegistration", "Tracker added with ID: ${documentReference.id}")
-                             Toast.makeText(this, "Tracker registered successfully", Toast.LENGTH_SHORT).show()
-                             startActivity(Intent(this, DashboardActivity::class.java))
-                             finish()
-                            }
-                            .addOnFailureListener { e ->
-                                Log.e("TrackerRegistration", "Error adding tracker", e)
-                                Toast.makeText(this, "Failed to register tracker", Toast.LENGTH_SHORT).show()
-                            }
-                    }
-                    .addOnFailureListener { e ->
-                        Log.e("TrackerRegistration", "Error creating user document", e)
-                        Toast.makeText(this, "Failed to register tracker", Toast.LENGTH_SHORT).show()
 
-                    }
+        Log.d("TrackerRegistrationActivity", "Attempting to write data to Firestore")
+
+        db.collection("trackers")
+            .add(trackerData)
+            .addOnSuccessListener { documentReference ->
+                Log.d("TrackerRegistrationActivity", "Tracker saved with ID: ${documentReference.id}")
+                showToast("Tracker registered successfully")
+                navigateToDashboard()
             }
-        }.addOnFailureListener { e ->
-            Log.e("TrackerRegistration", "Error checking user document", e)
-            Toast.makeText(this, "Failed to register tracker", Toast.LENGTH_SHORT).show()
-        }
+            .addOnFailureListener { e ->
+                Log.e("FirestoreError", "Failed To write Data")
+                Log.e("TrackerRegistrationActivity", "Error saving tracker", e)
+                showToast("Failed to register tracker")
+            }
+
+    }
+    // Show Toast
+    private fun showToast(message: String) {
+        Log.d("TrackerRegistrationActivity", "Function called: showToast")
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    }
+    // Navigate To Dashboard
+    private fun navigateToDashboard() {
+        Log.d("TrackerRegistrationActivity", "Function called: navigateToDashboard")
+        val intent = Intent(this, DashboardActivity::class.java)
+        startActivity(intent)
+        finish()
     }
 
 }

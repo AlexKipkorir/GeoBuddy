@@ -26,6 +26,9 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import android.content.Intent
 import android.util.Log
+import android.view.LayoutInflater
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.firebase.auth.FirebaseAuth
 
 class DashboardActivity : AppCompatActivity(), OnMapReadyCallback {
 
@@ -35,8 +38,9 @@ class DashboardActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var findMeButton: FloatingActionButton
     private lateinit var addTrackerButton: FloatingActionButton
     private val markers = mutableListOf<Marker>()
+    private lateinit var auth: FirebaseAuth
 
-    // Dummy tracker data (around Nairobi)
+    // Dummy tracker data
     private val trackers = listOf(
         Tracker("Tracker 1", "Active", "80%", -1.2921, 36.8219),
         Tracker("Tracker 2", "Offline", "50%", -0.1678025162622931, 35.96421574323334),
@@ -84,26 +88,45 @@ class DashboardActivity : AppCompatActivity(), OnMapReadyCallback {
             override fun onNothingSelected(parent: AdapterView<*>?) {}
         }
 
-        // Profile button click (placeholder)
-        findViewById<ImageView>(R.id.profileButton).setOnClickListener {
-            // TODO: Implement profile view functionality
+
+        auth = FirebaseAuth.getInstance()
+
+        val profileButton = findViewById<ImageView>(R.id.profileButton)
+        profileButton.setOnClickListener {
+            showProfileBottomSheet()
+        }
+    }
+
+    private fun showProfileBottomSheet() {
+        val bottomSheetView = LayoutInflater.from(this).inflate(R.layout.profile_bottom_sheet, null)
+        val bottomSheetDialog = BottomSheetDialog(this)
+        bottomSheetDialog.setContentView(bottomSheetView)
+
+        val logoutButton = bottomSheetView.findViewById<Button>(R.id.logoutButton)
+        logoutButton.setOnClickListener {
+            logoutUser()
+            bottomSheetDialog.dismiss() // Close bottom sheet
         }
 
-        // Find Me Button
-        findMeButton = findViewById(R.id.findMeButton)
-        findMeButton.setOnClickListener {
-            if (::googleMap.isInitialized) {
-            findUserLocation()
-            } else {
-                Log.e("DashboardActivity", "Google Map is not initialized.")
-            }
-        }
+        bottomSheetDialog.show()
+    }
+
+    private fun logoutUser() {
+        auth.signOut() // Firebase Logout
+
+        // Redirect to Login Screen
+        val intent = Intent(this, LoginActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
+        finish() // Close MainActivity
     }
 
     override fun onMapReady(map: GoogleMap) {
         Log.d("DashboardActivity", "onMapReady called")
         googleMap = map
         googleMap.uiSettings.isZoomControlsEnabled = true
+        googleMap.uiSettings.isMyLocationButtonEnabled = false
+
 
         // Check for location permission
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
@@ -111,6 +134,15 @@ class DashboardActivity : AppCompatActivity(), OnMapReadyCallback {
             findUserLocation()
         } else {
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_PERMISSION_REQUEST_CODE)
+        }
+        // Find Me Button
+        findMeButton = findViewById(R.id.findMeButton)
+        findMeButton.setOnClickListener {
+            if (::googleMap.isInitialized) {
+                findUserLocation()
+            } else {
+                Log.e("DashboardActivity", "Google Map is not initialized.")
+            }
         }
 
         // Add markers for trackers

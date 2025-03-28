@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#D98A8A8A"
     tools:context=".MainActivity">
 
+    <!-- Map Fragment -->
+
     <!-- Profile Button (Top Right) -->
+
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/mapFragment"
         android:name="com.google.android.gms.maps.SupportMapFragment"
@@ -19,8 +23,10 @@
         android:layout_height="50dp"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
-        android:layout_margin="16dp"
-        android:background="@drawable/circle_background"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/dash_fab"
         android:contentDescription="@string/profile_button"
         android:scaleType="centerCrop"
         android:src="@drawable/profile_placeholder" />
@@ -32,8 +38,9 @@
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:layout_margin="16dp"
-        android:background="@color/cardview_shadow_end_color"
+        android:layout_margin="23dp"
+        android:background="@drawable/dash_spinner"
+        android:dropDownWidth="wrap_content"
         android:minHeight="48dp" />
 
     <!-- Register New Tracker Button (Bottom Left) -->
@@ -43,10 +50,11 @@
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_alignParentBottom="true"
-        android:layout_margin="16dp"
+        android:layout_margin="20dp"
         android:contentDescription="@string/register_new_tracker"
-        android:src="@android:drawable/ic_input_add" />
-
+        android:src="@android:drawable/ic_input_add"
+        android:tint="#FDFDFD"
+        android:background="@drawable/dash_fab" />
     <!-- "Find Me" Button (Bottom Center) -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/findMeButton"
@@ -54,7 +62,11 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
+        android:layout_marginBottom="20dp"
         android:contentDescription="@string/find_me"
-        android:layout_marginBottom="16dp"
-        android:src="@android:drawable/ic_menu_mylocation" />
+        android:src="@android:drawable/ic_menu_mylocation"
+        android:tint="#FFFFFF"
+        app:backgroundTint="#00C853"
+        app:backgroundTintMode="src_over"
+        />
 </RelativeLayout>

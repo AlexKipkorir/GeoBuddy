@@ -25,9 +25,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
@@ -112,31 +110,6 @@ class TrackerRegistrationActivity : AppCompatActivity() {
             registerTracker()
         }
 
-        // Test for Firebase
-        if (FirebaseApp.getApps(this).isEmpty()) {
-            Log.e("FirebaseDebug", "Firebase not initialized")
-        } else {
-            Log.d("FirebaseDebug", "Firebase initialized: ${FirebaseApp.getInstance().name}")
-        }
-
-        findViewById<Button>(R.id.testButton).setOnClickListener {
-            val testDb = FirebaseFirestore.getInstance()
-            val testDoc = testDb.collection("test_collection").document("test_doc")
-
-            val testData = hashMapOf(
-                "testField" to "Hello, Firebase!",
-                "timestamp" to FieldValue.serverTimestamp()
-            )
-
-            testDoc.set(testData)
-                .addOnSuccessListener {
-                    Log.d("FirestoreTest", "Test Data saved successfully")
-                }
-                .addOnFailureListener { e ->
-                    Log.e("FirestoreTest", "Error saving test data", e)
-                }
-        }
-
     }
 
     // Notification Channel
@@ -181,6 +154,7 @@ class TrackerRegistrationActivity : AppCompatActivity() {
             notify(NOTIFICATION_ID, builder.build())
         }
     }
+    // Handle permission request result
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -341,6 +315,7 @@ class TrackerRegistrationActivity : AppCompatActivity() {
                 if (documents.size() >= maxTrackersAllowed) {
                     Log.e("TrackerRegistrationActivity", "Maximum trackers reached")
                     Toast.makeText(this, "Maximum trackers reached", Toast.LENGTH_SHORT).show()
+                    sendNotification(this,"Registration Failed","Maximum trackers reached")
                     return@addOnSuccessListener
                 }
 
@@ -421,6 +396,5 @@ class TrackerRegistrationActivity : AppCompatActivity() {
         startActivity(intent)
         finish()
     }
-
 
 }

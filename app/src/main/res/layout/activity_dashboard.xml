@@ -8,15 +8,13 @@
     tools:context=".MainActivity">
 
     <!-- Map Fragment -->
-
-    <!-- Profile Button (Top Right) -->
-
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/mapFragment"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+    <!-- Profile Button (Top Right) -->
     <ImageView
         android:id="@+id/profileButton"
         android:layout_width="50dp"
@@ -53,8 +51,10 @@
         android:layout_margin="20dp"
         android:contentDescription="@string/register_new_tracker"
         android:src="@android:drawable/ic_input_add"
-        android:tint="#FDFDFD"
-        android:background="@drawable/dash_fab" />
+        android:tint="#FFFFFF"
+        app:backgroundTint="#00C853"
+        app:backgroundTintMode="src_over"/>
+
     <!-- "Find Me" Button (Bottom Center) -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/findMeButton"

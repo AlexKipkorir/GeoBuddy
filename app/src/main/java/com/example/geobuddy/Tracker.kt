@@ -7,4 +7,3 @@ data class Tracker (
     val latitude: Double,
     val longitude: Double
 )
-

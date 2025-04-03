@@ -37,6 +37,7 @@ class DashboardActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var findMeButton: FloatingActionButton
     private lateinit var addTrackerButton: FloatingActionButton
+    private lateinit var profileButton: ImageView
     private val trackerList = mutableListOf<Tracker>()
     private lateinit var auth: FirebaseAuth
     private lateinit var db: FirebaseFirestore
@@ -52,6 +53,8 @@ class DashboardActivity : AppCompatActivity(), OnMapReadyCallback {
         setContentView(R.layout.activity_dashboard)
 
         addTrackerButton = findViewById(R.id.addTrackerButton)
+        profileButton = findViewById(R.id.profileButton)
+
 
         auth = FirebaseAuth.getInstance()
         db = FirebaseFirestore.getInstance()
@@ -61,6 +64,13 @@ class DashboardActivity : AppCompatActivity(), OnMapReadyCallback {
             val intent = Intent(this, TrackerRegistrationActivity::class.java)
             startActivity(intent)
         }
+
+        //Profile Button init
+        profileButton.setOnClickListener{
+            val intent = Intent(this, ProfileActivity::class.java)
+            startActivity(intent)
+        }
+
         // Initialize FusedLocationProviderClient
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
@@ -71,14 +81,16 @@ class DashboardActivity : AppCompatActivity(), OnMapReadyCallback {
 
         // Set up tracker dropdown
         trackerSpinner = findViewById(R.id.trackerSpinner)
-
+        /*
         //Profile button init
         val profileButton = findViewById<ImageView>(R.id.profileButton)
         profileButton.setOnClickListener {
             showProfileBottomSheet()
         }
-    }
 
+         */
+    }
+    /*
     //Profile Button Functionality
     private fun showProfileBottomSheet() {
         val bottomSheetView = LayoutInflater.from(this).inflate(R.layout.profile_bottom_sheet, null)
@@ -88,6 +100,14 @@ class DashboardActivity : AppCompatActivity(), OnMapReadyCallback {
         val logoutButton = bottomSheetView.findViewById<Button>(R.id.logoutButton)
         logoutButton.setOnClickListener {
             logoutUser()
+            bottomSheetDialog.dismiss()
+        }
+        // Find the Profile Dashboard button and set its click listener
+        val profileDashboardButton = bottomSheetView.findViewById<Button>(R.id.profileDashboardButton)
+        profileDashboardButton.setOnClickListener {
+            // Start the ProfileActivity
+            val intent = Intent(this, ProfileActivity::class.java)
+            startActivity(intent)
             bottomSheetDialog.dismiss()
         }
 
@@ -104,6 +124,7 @@ class DashboardActivity : AppCompatActivity(), OnMapReadyCallback {
         startActivity(intent)
         finish() // Close MainActivity
     }
+    */
 
     //Map functionality
     override fun onMapReady(map: GoogleMap) {
@@ -158,9 +179,6 @@ class DashboardActivity : AppCompatActivity(), OnMapReadyCallback {
             .whereEqualTo("userId", userId)
             .get()
             .addOnSuccessListener { querySnapshot ->
-                // Clear any previous markers on the map and list
-                googleMap.clear()
-                trackerList.clear()
 
                 // List for spinner items
                 val spinnerItems = mutableListOf<String>()
@@ -203,14 +221,22 @@ class DashboardActivity : AppCompatActivity(), OnMapReadyCallback {
                     override fun onNothingSelected(parent: AdapterView<*>?) { }
                 }
 
-                // Move camera to the first one.
-                if (trackerList.isNotEmpty()) {
-                    val firstTracker = trackerList[0]
-                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(firstTracker.latitude, firstTracker.longitude), 12f))
+                // Set spinner listener to move the map camera to the selected tracker.
+                trackerSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                    override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                        // Retrieve the selected tracker and animate the camera to its location.
+                        val selectedTracker = trackerList[position]
+                        val targetPos = LatLng(selectedTracker.latitude, selectedTracker.longitude)
+                        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(targetPos, 14f))
+                    }
+
+                    override fun onNothingSelected(parent: AdapterView<*>?) {
+                        // No action needed
+                    }
                 }
             }
             .addOnFailureListener { exception ->
-                Log.e("MainActivity", "Error fetching trackers: ", exception)
+                Log.e("DashboardActivity", "Error fetching trackers: ", exception)
             }
     }
 }

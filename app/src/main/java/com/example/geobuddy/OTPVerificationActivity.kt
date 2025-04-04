@@ -4,14 +4,14 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
-import com.example.geobuddy.api.RetrofitClient
+import com.example.geobuddy.retrofit.ApiResponse
+import com.example.geobuddy.retrofit.OtpRequest
+import com.example.geobuddy.retrofit.OtpVerificationRequest
+import com.example.geobuddy.retrofit.RetrofitClient
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import com.example.geobuddy.OtpRequest
-import com.example.geobuddy.OtpVerificationRequest
-import com.example.geobuddy.RetrofitService
-import com.example.geobuddy.ApiResponse
+import com.example.geobuddy.retrofit.RetrofitService
 
 class OTPVerificationActivity : AppCompatActivity() {
     private lateinit var email: String

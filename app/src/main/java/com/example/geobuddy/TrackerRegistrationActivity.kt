@@ -114,7 +114,7 @@ class TrackerRegistrationActivity : AppCompatActivity() {
 
     // Notification Channel
     // Function to create the notification channel
-    fun createNotificationChannel(context: Context) {
+    private fun createNotificationChannel(context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val name = "Tracker Status"
             val descriptionText = "Notification for tracker registration status"
@@ -128,7 +128,7 @@ class TrackerRegistrationActivity : AppCompatActivity() {
         }
     }
     // Function to send a notification
-    fun sendNotification(context: Context,title: String, message: String) {
+    private fun sendNotification(context: Context,title: String, message: String) {
         // Create a notification
         createNotificationChannel(context)
         //Check if permission is granted (Android 13+ requires it)
@@ -279,6 +279,7 @@ class TrackerRegistrationActivity : AppCompatActivity() {
         removeImageButton.visibility = View.GONE
     }
 
+    @Deprecated("This method has been deprecated in favor of using the Activity Result API\n      which brings increased type safety via an {@link ActivityResultContract} and the prebuilt\n      contracts for common intents available in\n      {@link androidx.activity.result.contract.ActivityResultContracts}, provides hooks for\n      testing, and allow receiving results in separate, testable classes independent from your\n      activity. Use\n      {@link #registerForActivityResult(ActivityResultContract, ActivityResultCallback)}\n      with the appropriate {@link ActivityResultContract} and handling the result in the\n      {@link ActivityResultCallback#onActivityResult(Object) callback}.")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == pickImageRequest && resultCode == Activity.RESULT_OK && data != null && data.data != null) {

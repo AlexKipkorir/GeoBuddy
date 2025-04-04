@@ -1,6 +1,5 @@
-package com.example.geobuddy
+package com.example.geobuddy.retrofit
 
-import com.example.geobuddy.ApiResponse
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.POST
@@ -11,4 +10,7 @@ interface RetrofitService {
 
     @POST("413ecae1-c537-4606-a732-a856acd6686a")
    fun verifyOtp(@Body request: OtpVerificationRequest): Call<ApiResponse>
+
+   @POST("auth/login")
+   fun loginUser(@Body request: LoginRequest): Call<LoginResponse>
 }

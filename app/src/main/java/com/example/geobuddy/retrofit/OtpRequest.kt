@@ -1,4 +1,4 @@
-package com.example.geobuddy
+package com.example.geobuddy.retrofit
 
 data class OtpRequest ( val email: String)
 

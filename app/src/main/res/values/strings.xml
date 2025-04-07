@@ -2,7 +2,7 @@
 <resources>
 
     <string name="app_name">GeoBuddy</string>
-    <string name="google_maps_key">{MAPS_API_KEY}}</string>
+    <string name="google_maps_key">{MAPS_API_KEY}</string>
     <string name="profile_button">Profile Button</string>
     <string name="register_new_tracker">Register New Tracker\n</string>
     <string name="find_me">Find Me</string>
@@ -39,7 +39,7 @@
     <string name="text">"Google Sign Up "</string>
     <string name="already_have_an_account">Already Have an Account? Log In</string>
     <string name="register_your_tracker">Register Your Tracker</string>
-    <string name="enter_lugggage_type">Enter Luggage Type</string>
+    <string name="enter_luggage_type">Enter Luggage Type</string>
     <string name="enter_luggage_color">Enter Luggage Color</string>
     <string name="enter_luggage_description">Enter Luggage Description</string>
     <string name="enter_pet_name">Enter Pet Name</string>

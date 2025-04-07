@@ -66,7 +66,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:autofillHints=""
-                android:hint="@string/enter_lugggage_type"
+                android:hint="@string/enter_luggage_type"
                 android:inputType="text"
                 android:visibility="gone"
                 app:layout_constraintTop_toBottomOf="@+id/layoutLuggage"

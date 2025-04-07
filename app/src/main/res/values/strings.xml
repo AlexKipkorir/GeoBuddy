@@ -2,7 +2,7 @@
 <resources>
 
     <string name="app_name">GeoBuddy</string>
-    <string name="google_maps_key">AIzaSyC6asU1ZaH666XzsL8QKUOhnl_uhjUij4c</string>
+    <string name="google_maps_key">{MAPS_API_KEY}}</string>
     <string name="profile_button">Profile Button</string>
     <string name="register_new_tracker">Register New Tracker\n</string>
     <string name="find_me">Find Me</string>
@@ -29,10 +29,10 @@
     <string name="resend_otp">Resend OTP</string>
     <string name="welcome">Welcome To</string>
     <string name="create_your_account">Create Your Account</string>
-    <string name="firstname">Firstname</string>
-    <string name="Firstname">Enter Your First Name</string>
-    <string name="lastname">Lastname</string>
-    <string name="Lastname">Enter Your Last Name</string>
+    <string name="username">Username</string>
+    <string name="Username">Enter Your Username</string>
+    <string name="phoneNo">Phone Number</string>
+    <string name="PhoneNo">Enter Your Phone Number</string>
     <string name="confirm_password">Confirm Password</string>
     <string name="terms_and_condition">Agree To Our Terms and Conditions</string>
     <string name="Sign_up">SIGN UP</string>
@@ -78,4 +78,5 @@
     <string name="save">Save</string>
     <string name="profile_image">Profile Image</string>
     <string name="cancel">Cancel</string>
+    <string name="profile_dashboard">profile dashboard</string>
 </resources>

@@ -18,3 +18,6 @@ l o c a l . p r o p e r t i e s
  
  
 /app/src/main/res/values/strings.xml
+/google-services.json
+/local.defaults.properties.txt
+/secrets.properties.txt

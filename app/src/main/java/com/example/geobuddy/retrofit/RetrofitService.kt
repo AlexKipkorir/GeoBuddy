@@ -1,6 +1,7 @@
 package com.example.geobuddy.retrofit
 
 import retrofit2.Call
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.POST
 
@@ -13,4 +14,7 @@ interface RetrofitService {
 
    @POST("auth/login")
    fun loginUser(@Body request: LoginRequest): Call<LoginResponse>
+
+    @POST("auth/signup")
+    fun registerUser(@Body request: SignupRequest): Response<SignupResponse>
 }

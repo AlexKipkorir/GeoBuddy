@@ -44,6 +44,7 @@
         <activity android:name=".DashboardActivity" />
         <activity android:name=".ProfileActivity"/>
         <activity android:name=".EditProfileActivity"/>
+        <activity android:name=".FAQActivity" />
 
     </application>
 

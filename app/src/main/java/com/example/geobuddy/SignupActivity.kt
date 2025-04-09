@@ -29,7 +29,7 @@ class SignupActivity : AppCompatActivity() {
         //auth = FirebaseAuth.getInstance()
 
         val usernameInput = findViewById<EditText>(R.id.usernameInput)
-        val phoneNoInput = findViewById<EditText>(R.id.phoneNoInput)
+        val phoneNoInput = findViewById<EditText>(R.id.phoneNumberInput)
         val emailInput = findViewById<EditText>(R.id.emailInput)
         val passwordInput = findViewById<EditText>(R.id.passwordInput)
         val confirmPasswordInput = findViewById<EditText>(R.id.confirmPasswordInput)
@@ -47,23 +47,20 @@ class SignupActivity : AppCompatActivity() {
         //Sign Up Button Click Listener
         signUpButton.setOnClickListener{
             val username = usernameInput.text.toString()
-            val phoneNo = phoneNoInput.text.toString()
+            val phoneNumber = phoneNoInput.text.toString()
             val email = emailInput.text.toString()
             val password = passwordInput.text.toString()
             val confirmPassword = confirmPasswordInput.text.toString().trim()
 
-            if(username.isEmpty() || phoneNo.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
+            if(username.isEmpty() || phoneNumber.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
                 Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-
-            if (password == confirmPassword) {
-                //TODO: Call Retrofit API to sign up user
-
-            } else {
-                Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT).show()
-            }
-            signUpUser(username,email,password)
+                if (password == confirmPassword) {
+                    signUpUser(username, phoneNumber, email, password)
+                } else {
+                    Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT).show()
+                }
 
         }
 
@@ -82,8 +79,8 @@ class SignupActivity : AppCompatActivity() {
 
     }
 
-    private fun signUpUser(username: String, email: String, password: String) {
-        val request = SignupRequest(username, email, password)
+    private fun signUpUser(username: String, phoneNumber: String, email: String, password: String) {
+        val request = SignupRequest(username,phoneNumber, email, password)
 
         val service = RetrofitClient.instance.create(RetrofitService::class.java)
         service.signUpUser(request).enqueue(object : Callback<SignupResponse> {

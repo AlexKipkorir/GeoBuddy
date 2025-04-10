@@ -80,14 +80,20 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"/>
 
+    <ImageView
+        android:id="@+id/passwordToggle"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginEnd="8dp"
+        android:src="@drawable/ic_eye"
+        android:contentDescription="@string/toggle_password_visibility"
+        android:clickable="true"
+        android:focusable="true"
+        app:layout_constraintTop_toTopOf="@+id/passwordInput"
+        app:layout_constraintBottom_toBottomOf="@+id/passwordInput"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
     <!--Sign In Button -->
-
-    <!-- OR Sign in with -->
-
-    <!--Google Sign-In Button -->
-
-    <!--Bottom Text: Sign Up & Forgot Password -->
-
     <Button
         android:id="@+id/signInButton"
         android:layout_width="216dp"
@@ -101,6 +107,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/passwordInput" />
 
+    <!-- OR Sign in with -->
     <TextView
         android:id="@+id/signInWithLabel"
         android:layout_width="221dp"
@@ -114,6 +121,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/signInButton" />
 
+    <!--Google Sign-In Button -->
     <ImageView
         android:id="@+id/googleSignInButton"
         android:layout_width="43dp"
@@ -127,6 +135,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/signInWithLabel" />
 
+    <!--Bottom Text: Sign Up & Forgot Password -->
     <LinearLayout
         android:id="@+id/bottomTextLayout"
         android:layout_width="match_parent"

@@ -2,6 +2,7 @@ package com.example.geobuddy
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
@@ -37,6 +38,9 @@ class SignupActivity : AppCompatActivity() {
         val signUpButton = findViewById<Button>(R.id.signUpButton)
         val googleSignUpButton = findViewById<ImageView>(R.id.googleSignUpButton)
         val signInText = findViewById<TextView>(R.id.signInText)
+        val passwordToggle: ImageView = findViewById(R.id.passwordToggle)
+        val confirmPasswordToggle = findViewById<ImageView>(R.id.confirmPasswordToggle)
+        var isPasswordVisible = false
 
 
         //Enable Sign-Up Button only if all fields are filled and terms are accepted
@@ -46,22 +50,27 @@ class SignupActivity : AppCompatActivity() {
 
         //Sign Up Button Click Listener
         signUpButton.setOnClickListener{
-            val username = usernameInput.text.toString()
-            val phoneNumber = phoneNoInput.text.toString()
-            val email = emailInput.text.toString()
-            val password = passwordInput.text.toString()
+            val username = usernameInput.text.toString().trim()
+            val phoneNumber = phoneNoInput.text.toString().trim()
+            val email = emailInput.text.toString().trim()
+            val password = passwordInput.text.toString().trim()
             val confirmPassword = confirmPasswordInput.text.toString().trim()
 
             if(username.isEmpty() || phoneNumber.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
                 Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
+                if (password.length < 6) {
+                    Toast.makeText(this, "Password must be at least 6 characters", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+
                 if (password == confirmPassword) {
-                    signUpUser(username, phoneNumber, email, password)
+
                 } else {
                     Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT).show()
                 }
-
+            signUpUser(username,email, password, phoneNumber)
         }
 
         //Google Sign Up Button Click Listener
@@ -77,18 +86,45 @@ class SignupActivity : AppCompatActivity() {
             finish()
         }
 
+        passwordToggle.setOnClickListener {
+            if (isPasswordVisible) {
+                passwordInput.inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
+                passwordToggle.setImageResource(R.drawable.ic_eye)
+            } else {
+                passwordInput.inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+                passwordToggle.setImageResource(R.drawable.ic_eye)
+            }
+            passwordInput.setSelection(passwordInput.text.length)
+            isPasswordVisible = !isPasswordVisible
+        }
+
+        confirmPasswordToggle.setOnClickListener{
+            if (isPasswordVisible) {
+                confirmPasswordInput.inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
+                confirmPasswordToggle.setImageResource(R.drawable.ic_eye)
+            } else {
+                confirmPasswordInput.inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+                confirmPasswordToggle.setImageResource(R.drawable.ic_eye)
+            }
+             confirmPasswordInput.setSelection(passwordInput.text.length)
+            isPasswordVisible = !isPasswordVisible
+        }
+
     }
 
-    private fun signUpUser(username: String, phoneNumber: String, email: String, password: String) {
-        val request = SignupRequest(username,phoneNumber, email, password)
+    private fun signUpUser(username: String,email: String,password: String, phoneNumber: String) {
+        val request = SignupRequest(username,email, password, phoneNumber)
 
-        val service = RetrofitClient.instance.create(RetrofitService::class.java)
+        val service = RetrofitClient.retrofitService
         service.signUpUser(request).enqueue(object : Callback<SignupResponse> {
 
             override fun onResponse(
                 call: Call<SignupResponse>,
                 response: retrofit2.Response<SignupResponse>
             ) {
+                Log.d("SIGNUP_RESPONSE", "Code: ${response.code()}")
+                Log.d("SIGNUP_RESPONSE", "Body: ${response.body()}")
+
                 if (response.isSuccessful) {
                     Toast.makeText(this@SignupActivity, "Sign up successful!", Toast.LENGTH_SHORT).show()
                     startActivity(Intent(this@SignupActivity, OTPVerificationActivity::class.java))

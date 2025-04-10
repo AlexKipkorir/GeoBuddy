@@ -1,4 +1,4 @@
-package com.example.geobuddy
+package com.example.geobuddy.models
 
 data class Tracker (
     val name: String,

@@ -21,6 +21,7 @@
         android:roundIcon="@drawable/geobuddy_logo"
         android:supportsRtl="true"
         android:theme="@style/Theme.GeoBuddy"
+        android:networkSecurityConfig="@xml/network_security_config"
         tools:targetApi="31">
 
         <meta-data
@@ -44,7 +45,10 @@
         <activity android:name=".DashboardActivity" />
         <activity android:name=".ProfileActivity"/>
         <activity android:name=".EditProfileActivity"/>
-        <activity android:name=".FAQActivity" />
+        <activity android:name=".FAQActivity"/>
+        <activity android:name=".ModifyPasswordActivity"/>
+        <activity android:name=".PrivacyPolicyActivity"/>
+        <activity android:name=".AboutUsActivity"/>
 
     </application>
 

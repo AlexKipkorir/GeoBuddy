@@ -2,26 +2,38 @@ package com.example.geobuddy
 
 import android.content.Intent
 import android.os.Bundle
+import android.provider.ContactsContract.CommonDataKinds.Email
+import android.util.Log
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
+import com.example.geobuddy.retrofit.RetrofitClient
+import com.example.geobuddy.retrofit.ApiResponse
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+
+import com.example.geobuddy.retrofit.UserProfile
+
+
+//import com.google.firebase.auth.FirebaseAuth
+//import com.google.firebase.firestore.FirebaseFirestore
 
 class ProfileActivity : AppCompatActivity() {
-
-    private lateinit var auth: FirebaseAuth
-    private lateinit var db: FirebaseFirestore
+//
+//    private lateinit var auth: FirebaseAuth
+//    private lateinit var db: FirebaseFirestore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile)
 
         //Initialize Firebase Authentication and Firestore
-        auth = FirebaseAuth.getInstance()
-        db = FirebaseFirestore.getInstance()
+//        auth = FirebaseAuth.getInstance()
+//        db = FirebaseFirestore.getInstance()
 
         //UI Elements
         val profileImage = findViewById<ImageView>(R.id.profileImage)
@@ -53,7 +65,8 @@ class ProfileActivity : AppCompatActivity() {
 
         //Navigate to other pages
         mapSettingsButton.setOnClickListener {
-            startActivity(Intent(this, MapSettingsActivity::class.java))
+           val dialog = MapSettingsActivity()
+            dialog.show(supportFragmentManager, "MapSettingsDialog")
         }
 
         modifyPasswordButton.setOnClickListener {
@@ -74,7 +87,11 @@ class ProfileActivity : AppCompatActivity() {
 
         //Logout button functionality
         logoutButton.setOnClickListener {
-            auth.signOut()
+//            auth.signOut()
+//            startActivity(Intent(this, LoginActivity::class.java))
+//            finish()
+            // Perform logout action (if any)
+            Toast.makeText(this, "Logged out", Toast.LENGTH_SHORT).show()
             startActivity(Intent(this, LoginActivity::class.java))
             finish()
         }
@@ -86,36 +103,81 @@ class ProfileActivity : AppCompatActivity() {
 
      }
 
+    //Firebase
     //Load user details from Firestore
-    private fun loadUserDetails(fullName: TextView, phoneNumber: TextView, email: TextView) {
-        val user = auth.currentUser
-        user?.let {
-            val userId = it.uid
-            db.collection("users").document(userId).get()
-                .addOnSuccessListener { document ->
-                    if (document.exists()) {
-                        fullName.text = document.getString("fullName") ?: "Unknown User"
-                        phoneNumber.text = document.getString("phoneNumber") ?: "No phone number"
-                        email.text = it.email ?: "Unknown Email"
-                    }
-                }
-                .addOnFailureListener {
-                    fullName.text = "Error loading user"
-                    phoneNumber.text = ""
-                    email.text = ""
-                }
+//    private fun loadUserDetails(fullName: TextView, phoneNumber: TextView, email: TextView) {
+//        val user = auth.currentUser
+//        user?.let {
+//            val userId = it.uid
+//            db.collection("users").document(userId).get()
+//                .addOnSuccessListener { document ->
+//                    if (document.exists()) {
+//                        fullName.text = document.getString("fullName") ?: "Unknown User"
+//                        phoneNumber.text = document.getString("phoneNumber") ?: "No phone number"
+//                        email.text = it.email ?: "Unknown Email"
+//                    }
+//                }
+//                .addOnFailureListener {
+//                    fullName.text = "Error loading user"
+//                    phoneNumber.text = ""
+//                    email.text = ""
+//                }
+//        }
+//    }
+//
+//    //Delete user account function
+//    private fun deleteUserAccount() {
+//        val user = auth.currentUser
+//        user?.delete()?.addOnCompleteListener { task ->
+//            if (task.isSuccessful) {
+//                db.collection("users").document(user.uid).delete()
+//                startActivity(Intent(this, LoginActivity::class.java))
+//                finish()
+//            }
+//        }
+//    }
+
+    //Retrofit
+    private fun loadUserDetails(userName: TextView, phoneNumber: TextView, email: TextView) {
+        val sharedPreferences = getSharedPreferences("login_prefs", MODE_PRIVATE)
+        val token = sharedPreferences.getString("jwt_token", "") ?: ""
+
+        if (token.isEmpty()) {
+            Toast.makeText(this, "Token not found. Please log in again.", Toast.LENGTH_SHORT).show()
+            startActivity(Intent(this, LoginActivity::class.java))
+            finish()
+            return
         }
+
+        val authHeader = "Bearer $token"
+        val retrofitService = RetrofitClient.retrofitService
+
+        retrofitService.getUserDetails(authHeader)
+            .enqueue(object : Callback<UserProfile> {
+            override fun onResponse(call: Call<UserProfile>, response: Response<UserProfile>) {
+               if (response.isSuccessful) {
+                   val userProfile = response.body()
+                   userProfile?.let {
+                       userName.text = it.username
+                       phoneNumber.text = it.phoneNumber
+                       email.text = it.email
+                   }
+               } else {
+                   val errorBody = response.errorBody()?.string()
+                   Toast.makeText(this@ProfileActivity, "Error loading user details", Toast.LENGTH_SHORT).show()
+                   Log.e("UserDetails", "Error: $errorBody")
+               }
+            }
+
+            override fun onFailure(call: Call<UserProfile>, t: Throwable) {
+               Toast.makeText(this@ProfileActivity, "Error loading user details", Toast.LENGTH_SHORT).show()
+                Log.e("UserDetails", "Network error", t)
+            }
+        })
     }
 
-    //Delete user account function
     private fun deleteUserAccount() {
-        val user = auth.currentUser
-        user?.delete()?.addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                db.collection("users").document(user.uid).delete()
-                startActivity(Intent(this, LoginActivity::class.java))
-                finish()
-            }
-        }
+        Toast.makeText(this, "Account deletion not implemented", Toast.LENGTH_SHORT).show()
+
     }
 }

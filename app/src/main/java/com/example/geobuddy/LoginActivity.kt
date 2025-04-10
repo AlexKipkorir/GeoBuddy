@@ -19,14 +19,14 @@ import retrofit2.Response
 
 
 class LoginActivity : AppCompatActivity() {
-    private lateinit var auth: FirebaseAuth
+//    private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
         // Initialize Firebase Authentication
-        auth = FirebaseAuth.getInstance()
+//        auth = FirebaseAuth.getInstance()
 
         val emailInput: EditText = findViewById(R.id.emailInput)
         val passwordInput: EditText = findViewById(R.id.passwordInput)
@@ -46,8 +46,8 @@ class LoginActivity : AppCompatActivity() {
                Toast.makeText(this, "Please enter email and password", Toast.LENGTH_SHORT).show()
                return@setOnClickListener
            }
-            signInUser(email, password)
-//            loginUser(email, password)
+//            signInUser(email, password)
+            loginUser(email, password)
         }
         // Google Sign In Button Click Listener
         googleSignInButton.setOnClickListener {
@@ -79,51 +79,51 @@ class LoginActivity : AppCompatActivity() {
 
     //Function to sign in user
 //    Firebase
-    private fun signInUser(email: String,password: String) {
-        auth.signInWithEmailAndPassword(email, password)
-            .addOnCompleteListener(this) { task ->
-                if(task.isSuccessful) {
-                    Toast.makeText(this, "Sign in Successful!", Toast.LENGTH_SHORT).show()
-                    startActivity(Intent(this, DashboardActivity::class.java))
-                    finish()
-                } else {
-                    Toast.makeText(this, "Sign in Failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
-                }
-            }
-    }
-
-    //Retrofit
-//    private fun loginUser(email: String, password: String) {
-//        val request = LoginRequest(email, password)
-//
-//        val service = RetrofitClient.retrofitService
-//        service.loginUser(request).enqueue(object : Callback<LoginResponse> {
-//
-//            override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {
-//                if (response.isSuccessful && response.body() != null) {
-//                    val loginResponse = response.body()!!
-//                    val token = loginResponse.token
-//                    val expiry = loginResponse.expiresIn
-//
-//                    //Save token and expiry to shared preferences
-//                    val prefs = getSharedPreferences("login_prefs", MODE_PRIVATE)
-//                    with(prefs.edit()) {
-//                        putString("jwt_token", token)
-//                        putLong("token_expiry", System.currentTimeMillis() + expiry)
-//                        apply()
-//                    }
-//
-//                    Toast.makeText(this@LoginActivity, "Login Successful", Toast.LENGTH_SHORT).show()
-//                    startActivity(Intent(this@LoginActivity, DashboardActivity::class.java))
+//    private fun signInUser(email: String,password: String) {
+//        auth.signInWithEmailAndPassword(email, password)
+//            .addOnCompleteListener(this) { task ->
+//                if(task.isSuccessful) {
+//                    Toast.makeText(this, "Sign in Successful!", Toast.LENGTH_SHORT).show()
+//                    startActivity(Intent(this, DashboardActivity::class.java))
 //                    finish()
 //                } else {
-//                    Toast.makeText(this@LoginActivity, "Login Failed: Invalid credentials", Toast.LENGTH_SHORT).show()
+//                    Toast.makeText(this, "Sign in Failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
 //                }
 //            }
-//
-//            override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
-//                Toast.makeText(this@LoginActivity, "Login Failed: ${t.message}", Toast.LENGTH_SHORT).show()
-//            }
-//        })
 //    }
+
+    //Retrofit
+    private fun loginUser(email: String, password: String) {
+        val request = LoginRequest(email, password)
+
+        val service = RetrofitClient.retrofitService
+        service.loginUser(request).enqueue(object : Callback<LoginResponse> {
+
+            override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {
+                if (response.isSuccessful && response.body() != null) {
+                    val loginResponse = response.body()!!
+                    val token = loginResponse.token
+                    val expiry = loginResponse.expiresIn
+
+                    //Save token and expiry to shared preferences
+                    val prefs = getSharedPreferences("login_prefs", MODE_PRIVATE)
+                    with(prefs.edit()) {
+                        putString("jwt_token", token)
+                        putLong("token_expiry", System.currentTimeMillis() + expiry)
+                        apply()
+                    }
+
+                    Toast.makeText(this@LoginActivity, "Login Successful", Toast.LENGTH_SHORT).show()
+                    startActivity(Intent(this@LoginActivity, DashboardActivity::class.java))
+                    finish()
+                } else {
+                    Toast.makeText(this@LoginActivity, "Login Failed: Invalid credentials", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
+                Toast.makeText(this@LoginActivity, "Login Failed: ${t.message}", Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
 }

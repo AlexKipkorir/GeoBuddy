@@ -37,7 +37,7 @@ class ProfileActivity : AppCompatActivity() {
 
         //UI Elements
         val profileImage = findViewById<ImageView>(R.id.profileImage)
-        val fullName = findViewById<TextView>(R.id.fullName)
+        val userName = findViewById<TextView>(R.id.fullName)
         val phoneNumber = findViewById<TextView>(R.id.phoneNumber)
         val email = findViewById<TextView>(R.id.email)
         val editButton = findViewById<Button>(R.id.editButton)
@@ -51,7 +51,7 @@ class ProfileActivity : AppCompatActivity() {
         val moreFunctionButton = findViewById<ImageButton>(R.id.moreFunctionButton)
 
         //Load user details from Firestore
-        loadUserDetails(fullName, phoneNumber, email)
+        loadUserDetails(userName, phoneNumber, email)
 
         //Edit button functionality
         editButton.setOnClickListener {
@@ -142,6 +142,9 @@ class ProfileActivity : AppCompatActivity() {
         val sharedPreferences = getSharedPreferences("login_prefs", MODE_PRIVATE)
         val token = sharedPreferences.getString("jwt_token", "") ?: ""
 
+        Log.d("TOKEN_CHECK", "Retrieved token: '$token'")
+
+
         if (token.isEmpty()) {
             Toast.makeText(this, "Token not found. Please log in again.", Toast.LENGTH_SHORT).show()
             startActivity(Intent(this, LoginActivity::class.java))
@@ -155,7 +158,7 @@ class ProfileActivity : AppCompatActivity() {
         retrofitService.getUserDetails(authHeader)
             .enqueue(object : Callback<UserProfile> {
             override fun onResponse(call: Call<UserProfile>, response: Response<UserProfile>) {
-               if (response.isSuccessful) {
+                if (response.isSuccessful) {
                    val userProfile = response.body()
                    userProfile?.let {
                        userName.text = it.username
@@ -164,6 +167,7 @@ class ProfileActivity : AppCompatActivity() {
                    }
                } else {
                    val errorBody = response.errorBody()?.string()
+                    Log.e("UserDetails", "Raw error body: $errorBody")
                    Toast.makeText(this@ProfileActivity, "Error loading user details", Toast.LENGTH_SHORT).show()
                    Log.e("UserDetails", "Error: $errorBody")
                }

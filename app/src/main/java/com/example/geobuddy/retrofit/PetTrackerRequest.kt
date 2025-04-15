@@ -1,4 +1,4 @@
-package com.example.geobuddy
+package com.example.geobuddy.retrofit
 
 data class PetTrackerRequest (
     val trackerName: String,
@@ -10,5 +10,5 @@ data class PetTrackerRequest (
     val breed: String,
     val age: Int,
     val description: String,
-    val ownerName: String,
+    val userId: String
 )

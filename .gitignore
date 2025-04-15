@@ -1,23 +1,30 @@
+# IDE files
 *.iml
-.gradle
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
+.idea/
+.idea/caches/
+.idea/libraries/
+.idea/modules.xml
+.idea/workspace.xml
+.idea/navEditor.xml
+.idea/assetWizardSettings.xml
+
+# OS
 .DS_Store
-/build
-/captures
-/.strings.xml
-.externalNativeBuild
-.cxx
+
+# Gradle
+.gradle/
+build/
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Local config files
 local.properties
-l o c a l . p r o p e r t i e s 
- 
- 
-/app/src/main/res/values/strings.xml
+secrets.properties
+local.defaults.properties
 /google-services.json
-/local.defaults.properties.txt
-/secrets.properties.txt
+
+# Ignore app-specific sensitive files
+app/src/main/res/values/strings.xml
+app/src/main/AndroidManifest.xml
+

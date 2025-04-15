@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.geobuddy"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+
+    <uses-feature
+        android:name="android.hardware.location.gps"
+        android:required="false" />
+
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@drawable/geobuddy_logo"
+        android:label="@string/app_name"
+        android:roundIcon="@drawable/geobuddy_logo"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.GeoBuddy"
+        android:networkSecurityConfig="@xml/network_security_config"
+        tools:targetApi="31">
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyCoMR_pQIOWLH6zhipzFkNcn22TUT_yXJ4" />
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:theme="@style/Theme.GeoBuddy">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".LoginActivity"/>
+        <activity android:name=".SignupActivity"/>
+        <activity android:name=".ForgotPasswordActivity"/>
+        <activity android:name=".OTPVerificationActivity"/>
+        <activity android:name=".TrackerRegistrationActivity"/>
+        <activity android:name=".DashboardActivity" />
+        <activity android:name=".ProfileActivity"/>
+        <activity android:name=".EditProfileActivity"/>
+        <activity android:name=".FAQActivity"/>
+        <activity android:name=".ModifyPasswordActivity"/>
+        <activity android:name=".PrivacyPolicyActivity"/>
+        <activity android:name=".AboutUsActivity"/>
+
+    </application>
+
+</manifest>

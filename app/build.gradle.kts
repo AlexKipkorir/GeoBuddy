@@ -6,6 +6,8 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     id("com.google.gms.google-services")
     kotlin("android")
+    alias(libs.plugins.secrets.gradle.plugin)
+
 }
 
 android {
@@ -18,7 +20,7 @@ android {
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
-
+//        resValue("string", "google_maps_key", project.findProperty("MAPS_API_KEY") as String)
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -40,7 +42,13 @@ android {
     }
     buildFeatures {
         compose = true
+        viewBinding = true
     }
+
+    secrets {
+    propertiesFileName = "secrets.properties"
+    defaultPropertiesFileName = "local.defaults.properties"
+   }
 }
 
 dependencies {
@@ -58,6 +66,7 @@ dependencies {
     implementation(libs.firebase.auth.ktx)
     implementation(libs.firebase.storage.ktx)
     implementation(libs.play.services.analytics.impl)
+    implementation(libs.support.annotations)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

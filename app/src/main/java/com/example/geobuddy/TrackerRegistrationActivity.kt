@@ -25,10 +25,19 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import com.example.geobuddy.retrofit.ChildTrackerRequest
+import com.example.geobuddy.retrofit.LuggageTrackerRequest
+import com.example.geobuddy.retrofit.PetTrackerRequest
+import com.example.geobuddy.retrofit.RetrofitClient
+import com.example.geobuddy.retrofit.TrackerImeiResponse
+import com.example.geobuddy.retrofit.TrackerRequest
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import java.util.UUID
 
 private const val CHANNEL_ID = "tracker_status_channel"
@@ -330,7 +339,8 @@ class TrackerRegistrationActivity : AppCompatActivity() {
 
                             imageRef.downloadUrl.addOnSuccessListener { imageUrl ->
                                 Log.d("TrackerRegistrationActivity", "Image URL retrieved: $imageUrl")
-                                saveTrackerToFirestore(userId, trackerName, imei, category, imageUrl.toString())
+//                                saveTrackerToFirestore(userId, trackerName, imei, category, imageUrl.toString())
+                                saveTrackerToBackend(userId, trackerName, imei, category, imageUrl.toString())
                             }
                         }
                         .addOnFailureListener { e ->
@@ -340,7 +350,8 @@ class TrackerRegistrationActivity : AppCompatActivity() {
 
                 } ?: run{
                     Log.d("TrackerRegistrationActivity", "No image selected, saving tracker without image")
-                    saveTrackerToFirestore(userId, trackerName, imei, category, null)
+//                    saveTrackerToFirestore(userId, trackerName, imei, category, null)
+                    saveTrackerToBackend(userId, trackerName, imei, category, null)
 
                 }
 
@@ -352,39 +363,172 @@ class TrackerRegistrationActivity : AppCompatActivity() {
 
     }
     // Save tracker to Firestore
-    private fun saveTrackerToFirestore(userId: String, trackerName: String, imei: String, category: String, imageUrl: String?) {
-        Log.d("TrackerRegistrationActivity", "Function called: saveTrackerToFirestore")
-        Log.d("TrackerRegistrationActivity", "Saving tracker to Firestore: userId=$userId, trackerName=$trackerName, imei=$imei, category=$category, imageUrl=$imageUrl")
+//    private fun saveTrackerToFirestore(userId: String, trackerName: String, imei: String, category: String, imageUrl: String?) {
+//        Log.d("TrackerRegistrationActivity", "Function called: saveTrackerToFirestore")
+//        Log.d("TrackerRegistrationActivity", "Saving tracker to Firestore: userId=$userId, trackerName=$trackerName, imei=$imei, category=$category, imageUrl=$imageUrl")
+//
+//        val trackerData = hashMapOf(
+//            "userId" to userId,
+//            "trackerName" to trackerName,
+//            "imei" to imei,
+//            "trackerType" to category,
+//            "imageUrl" to (imageUrl ?: ""),
+//            "trackerStatus" to "Active",
+//            "latitude" to 0.0,
+//            "longitude" to 0.0,
+//            "battery" to "100%",
+//            "createdAt" to FieldValue.serverTimestamp()
+//        )
+//
+//        Log.d("TrackerRegistrationActivity", "Attempting to write data to Firestore")
+//
+//        db.collection("trackers")
+//            .add(trackerData)
+//            .addOnSuccessListener { documentReference ->
+//                Log.d("TrackerRegistrationActivity", "Tracker saved with ID: ${documentReference.id}")
+//                showToast("Tracker registered successfully")
+//                navigateToDashboard()
+//            }
+//            .addOnFailureListener { e ->
+//                Log.e("FirestoreError", "Failed To write Data")
+//                Log.e("TrackerRegistrationActivity", "Error saving tracker", e)
+//                showToast("Failed to register tracker")
+//            }
+//
+//    }
+    //Retrofit
+    private fun saveTrackerToBackend(userId: String, trackerName: String, imei: String, category: String, imageUrl: String?){
+        val retrofitService = RetrofitClient.retrofitService
+//        val prefs = getSharedPreferences("login_prefs", MODE_PRIVATE)
+//        val token = prefs.getString("jwt_token", "") ?: ""
 
-        val trackerData = hashMapOf(
-            "userId" to userId,
-            "trackerName" to trackerName,
-            "imei" to imei,
-            "trackerType" to category,
-            "imageUrl" to (imageUrl ?: ""),
-            "trackerStatus" to "Active",
-            "latitude" to 0.0,
-            "longitude" to 0.0,
-            "battery" to "100%",
-            "createdAt" to FieldValue.serverTimestamp()
-        )
+        registerTrackerButton.isEnabled = false
+        registerTrackerButton.setText(R.string.registering)
 
-        Log.d("TrackerRegistrationActivity", "Attempting to write data to Firestore")
+        //Check if IMEI exists
+        retrofitService.getTrackerByImei(imei).enqueue(object : Callback<TrackerImeiResponse> {
+            override fun onResponse(call: Call<TrackerImeiResponse>, response: Response<TrackerImeiResponse>) {
+                if (response.isSuccessful && response.body() == null) {
+                    Log.d("IMEI_CHECK", "IMEI exists. Proceed with $category tracker registration.")
+                    val imeiData = response.body()
 
-        db.collection("trackers")
-            .add(trackerData)
-            .addOnSuccessListener { documentReference ->
-                Log.d("TrackerRegistrationActivity", "Tracker saved with ID: ${documentReference.id}")
-                showToast("Tracker registered successfully")
-                navigateToDashboard()
+                    Log.d("IMEI_RESPONSE", "Data: $imeiData")
+
+                    when (category.lowercase()) {
+                        "pet" -> {
+                            val petRequest = PetTrackerRequest(
+                                trackerName = trackerName,
+                                imei = imei,
+                                batteryCapacity = imeiData?.batteryCapacity ?: 0.0,
+                                latitude = imeiData?.latitude ?: 0.0,
+                                longitude = imeiData?.longitude ?: 0.0,
+                                status = imeiData?.status ?: "Active",
+                                breed = breedInput.text.toString(),
+                                age = petAgeInput.text.toString().toIntOrNull() ?: 0,
+                                description = petDescriptionInput.text.toString(),
+                                userId = userId
+                            )
+                            Log.d("REGISTER_PET", "Sending pet tracker request: $petRequest")
+
+                            retrofitService.registerPetTracker( petRequest)
+                                .enqueue(object : Callback<Void> {
+                                    override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                                        Log.d("REGISTER_PET", "Response code: ${response.code()}")
+                                        if (response.isSuccessful) {
+                                            Log.d("REGISTER_PET", "Pet tracker registered successfully")
+                                            showToast("Pet tracker registered successfully")
+                                            navigateToDashboard()
+                                        } else {
+                                            val errorBody = response.errorBody()?.string()
+                                            Log.e("REGISTER_PET", "Failed to register pet tracker. Code: ${response.code()}, Error: $errorBody")
+
+                                            registerTrackerButton.isEnabled = true
+                                            registerTrackerButton.setText(R.string.register_tracker)
+                                                showToast("Failed to register pet tracker")
+                                        }
+                                    }
+                                    override fun onFailure(call: Call<Void>, t: Throwable) {
+                                        Log.e("REGISTER_PET", "Network failure during pet tracker registration", t)
+                                        showToast("Failed to register pet tracker: ${t.message}")
+                                    }
+                                })
+                        }
+                        "child" -> {
+                            val childRequest = ChildTrackerRequest(
+                                trackerName = trackerName,
+                                imei = imei,
+                                batteryCapacity = imeiData?.batteryCapacity ?: 0.0,
+                                latitude = imeiData?.latitude ?: 0.0,
+                                longitude = imeiData?.longitude ?: 0.0,
+                                status = imeiData?.status ?: "Active",
+                                age = childAgeInput.text.toString().toIntOrNull() ?: 0,
+                                description = childDescriptionInput.text.toString(),
+                                name = childNameInput.text.toString(),
+                                userId = userId
+                            )
+                            retrofitService.registerChildTracker(childRequest)
+                                .enqueue(object : Callback<Void> {
+                                    override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                                        if (response.isSuccessful) {
+                                            showToast("Child tracker registered")
+                                            navigateToDashboard()
+                                        } else {
+                                            registerTrackerButton.isEnabled = true
+                                            registerTrackerButton.setText(R.string.register_tracker)
+                                            showToast("Failed to register child tracker")
+                                        }
+                                    }
+                                    override fun onFailure(call: Call<Void>, t: Throwable) {
+                                        showToast("Error saving child tracker: ${t.message}")
+                                    }
+                                })
+                        }
+                        "luggage" -> {
+                            val luggageRequest = LuggageTrackerRequest(
+                                trackerName = trackerName,
+                                imei = imei,
+                                batteryCapacity = imeiData?.batteryCapacity ?: 0.0,
+                                latitude = imeiData?.latitude ?: 0.0,
+                                longitude = imeiData?.longitude ?: 0.0,
+                                status = imeiData?.status ?: "Active",
+                                color = colorInput.text.toString(),
+                                description = luggageDescriptionInput.text.toString(),
+                                name = luggageNameInput.text.toString(),
+                                userId = userId
+                            )
+                            retrofitService.registerLuggageTracker(luggageRequest)
+                                .enqueue(object : Callback<Void> {
+                                    override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                                      if(response.isSuccessful) {
+                                          showToast("Luggage tracker registered")
+                                          navigateToDashboard()
+                                      } else {
+                                          registerTrackerButton.isEnabled = true
+                                          registerTrackerButton.setText(R.string.register_tracker)
+                                          showToast("Failed to register luggage tracker")
+                                      }
+                                    }
+                                    override fun onFailure(call: Call<Void>, t: Throwable) {
+                                        showToast("Error saving luggage tracker: ${t.message}")
+                                    }
+                                })
+                        }
+
+                    }
+                } else {
+                    showToast("IMEI not found. Please check the device registration.")
+                }
             }
-            .addOnFailureListener { e ->
-                Log.e("FirestoreError", "Failed To write Data")
-                Log.e("TrackerRegistrationActivity", "Error saving tracker", e)
-                showToast("Failed to register tracker")
+
+            override fun onFailure(call: Call<TrackerImeiResponse>, t: Throwable) {
+               showToast("Failed to verify IMEI: ${t.message}")
+                Log.e("IMEI_FETCH_ERROR", "Message: ${t.message}")
             }
 
+        })
     }
+
+
     // Show Toast
     private fun showToast(message: String) {
         Log.d("TrackerRegistrationActivity", "Function called: showToast")

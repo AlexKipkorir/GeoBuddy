@@ -31,6 +31,7 @@ class OTPVerificationActivity : AppCompatActivity() {
         setContentView(R.layout.activity_otp_verification)
 
         email = intent.getStringExtra("email") ?: ""
+        Log.d("EMAIL_RECEIVED", "Received email from intent: '$email'")
         otpInput = findViewById(R.id.otpInput)
         verifyButton = findViewById(R.id.verifyButton)
         resendOtpText = findViewById(R.id.resendOtpText)
@@ -38,13 +39,13 @@ class OTPVerificationActivity : AppCompatActivity() {
         apiService = RetrofitClient.retrofitService
 
         verifyButton.setOnClickListener {
-            val otp = otpInput.text.toString().trim()
+            val verificationCode = otpInput.text.toString().trim()
 
-            if (otp.length != 6) {
+            if (verificationCode.length != 6) {
                 Toast.makeText(this, "Please enter a valid OTP", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-            verifyOTP(email, otp)
+            verifyOTP(email, verificationCode )
         }
         resendOtpText.setOnClickListener {
             sendOTP(email)
@@ -77,17 +78,21 @@ class OTPVerificationActivity : AppCompatActivity() {
 
     // Function to verify OTP
     private fun verifyOTP(email: String, verificationCode: String) {
+        Log.d("VERIFY_INPUT", "Email: $email, Code: $verificationCode")
+        Log.d("VERIFYING", "Verifying for email: '$email'")
+
         val request = OtpVerificationRequest(email, verificationCode) // Create a verification request object
         val call = apiService.verifyOtp(request)
 
-        call.enqueue(object : Callback<ResponseBody> {
+        call.enqueue(object : Callback<OtpResponse> {
             // Handle successful response
-            override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+            override fun onResponse(call: Call<OtpResponse>, response: Response<OtpResponse>) {
 
                 Log.d("OTP_RESPONSE", "Code: ${response.code()}")
                 Log.d("OTP_RESPONSE", "Body: ${response.body()}")
-                if (response.isSuccessful) {
-                    val message = response.body()?.string() ?: "No response"
+
+                if (response.isSuccessful && response.body() != null)  {
+                    val message = response.body()!!.message
                     Toast.makeText(this@OTPVerificationActivity, message, Toast.LENGTH_SHORT).show()
                     startActivity(Intent(this@OTPVerificationActivity, DashboardActivity::class.java))
                     finish()
@@ -100,7 +105,7 @@ class OTPVerificationActivity : AppCompatActivity() {
             }
 
             // Handle failure
-            override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+            override fun onFailure(call: Call<OtpResponse>, t: Throwable) {
                 Log.e("OTP_ERROR", "Failed to verify OTP: ${t.message}", t)
                 Toast.makeText(this@OTPVerificationActivity, "Verification Failed", Toast.LENGTH_SHORT).show()
             }

@@ -1,5 +1,6 @@
 package com.example.geobuddy.retrofit
 
+import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -14,6 +15,16 @@ object RetrofitClient {
             level = HttpLoggingInterceptor.Level.BODY
         }
 
+        val gson = GsonBuilder()
+            .setLenient()
+            .create()
+
+        val retrofit= Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create(gson))
+            .build()
+
+
         val client = OkHttpClient.Builder()
             .addInterceptor(logging)
             .connectTimeout(30, TimeUnit.SECONDS)
@@ -26,6 +37,7 @@ object RetrofitClient {
             .client(client)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
+
     }
 
     val retrofitService: RetrofitService by lazy {

@@ -2,6 +2,7 @@ package com.example.geobuddy
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
@@ -102,7 +103,7 @@ class LoginActivity : AppCompatActivity() {
             override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {
                 if (response.isSuccessful && response.body() != null) {
                     val loginResponse = response.body()!!
-                    val token = loginResponse.token
+                    val token = loginResponse.response
                     val expiry = loginResponse.expiresIn
 
                     //Save token and expiry to shared preferences
@@ -114,6 +115,9 @@ class LoginActivity : AppCompatActivity() {
                     }
 
                     Toast.makeText(this@LoginActivity, "Login Successful", Toast.LENGTH_SHORT).show()
+                    Log.d("LOGIN_SUCCESS", "Token received: $token")
+                    val savedToken = prefs.getString("jwt_token", "")
+                    Log.d("STORED_TOKEN", "Saved token: $savedToken")
                     startActivity(Intent(this@LoginActivity, DashboardActivity::class.java))
                     finish()
                 } else {

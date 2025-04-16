@@ -29,6 +29,30 @@
         android:scaleType="centerCrop"
         android:src="@drawable/profile_placeholder" />
 
+    <!-- Route Button: Launches navigation (best route) for the selected tracker -->
+    <ImageButton
+        android:id="@+id/routeButton"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_below="@id/profileButton"
+        android:layout_alignEnd="@id/profileButton"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/circle_background"
+        android:contentDescription="@string/route_to_tracker"
+        android:src="@android:drawable/ic_menu_directions" />
+
+    <!-- Street View Button: Shows the surrounding area via Street View -->
+    <ImageButton
+        android:id="@+id/streetViewButton"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_below="@id/routeButton"
+        android:layout_alignEnd="@id/routeButton"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/circle_background"
+        android:contentDescription="@string/street_view"
+        android:src="@android:drawable/ic_menu_mapmode" />
+
     <!-- Tracker Dropdown (Top Left) -->
     <Spinner
         android:id="@+id/trackerSpinner"

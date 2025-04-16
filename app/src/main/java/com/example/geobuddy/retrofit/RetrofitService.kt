@@ -1,5 +1,6 @@
 package com.example.geobuddy.retrofit
 
+import com.example.geobuddy.models.Tracker
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.FormUrlEncoded
@@ -51,6 +52,9 @@ interface RetrofitService {
         @Field("mobile") mobile: String,
         @Field("newPassword") newPassword: String
     ): Call<ApiResponse>
+
+    @GET("trackers")
+    fun getTrackers(@Query("userId") userId: String): Call<List<Tracker>>
 
     //Trackers
     @GET("trackers/{imei}")

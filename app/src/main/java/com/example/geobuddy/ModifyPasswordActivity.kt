@@ -83,13 +83,15 @@ class ModifyPasswordActivity : AppCompatActivity()  {
                 Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
+            val prefs = getSharedPreferences("login_prefs", MODE_PRIVATE)
+            val token = prefs.getString("jwt_token", "") ?: ""
 
             RetrofitClient.retrofitService.validateUser(mobile, email, oldPassword)
                 .enqueue(object : Callback<ApiResponse> {
                     override fun onResponse(call: Call<ApiResponse>, response: Response<ApiResponse>) {
                         if (response.isSuccessful && response.body()?.success == true) {
                             // Call update password
-                            RetrofitClient.retrofitService.updatePassword(mobile, newPassword)
+                            RetrofitClient.retrofitService.updatePassword(token, mobile, newPassword)
                                 .enqueue(object : Callback<ApiResponse> {
                                     override fun onResponse(call: Call<ApiResponse>, response: Response<ApiResponse>) {
                                         if (response.isSuccessful && response.body()?.success == true) {

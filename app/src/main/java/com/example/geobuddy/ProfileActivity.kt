@@ -10,11 +10,14 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.material3.AlertDialog
 import com.example.geobuddy.retrofit.RetrofitClient
 import com.example.geobuddy.retrofit.ApiResponse
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import androidx.appcompat.app.AlertDialog
+
 
 import com.example.geobuddy.retrofit.UserProfile
 
@@ -181,7 +184,49 @@ class ProfileActivity : AppCompatActivity() {
     }
 
     private fun deleteUserAccount() {
-        Toast.makeText(this, "Account deletion not implemented", Toast.LENGTH_SHORT).show()
+        val prefs = getSharedPreferences("login_prefs", MODE_PRIVATE)
+        val token = prefs.getString("jwt_token", "") ?: ""
 
+        if (token.isEmpty()) {
+            Toast.makeText(this, "Token not found. Please log in again.", Toast.LENGTH_SHORT).show()
+            startActivity(Intent(this, LoginActivity::class.java))
+            finish()
+            return
+        }
+
+        AlertDialog.Builder(this)
+            .setTitle("Confirm Deletion")
+            .setMessage("Are you sure you want to delete your account?")
+            .setPositiveButton("Delete") { _, _ ->
+                val retrofitService = RetrofitClient.retrofitService
+                val authHeader = "Bearer $token"
+                
+                retrofitService.deleteAccount(authHeader).enqueue(object : Callback<ApiResponse>  {
+                    override fun onResponse(call: Call<ApiResponse>, response: Response<ApiResponse>) {
+                        if (response.isSuccessful) {
+                            Toast.makeText(this@ProfileActivity, "Account deleted successfully", Toast.LENGTH_SHORT).show()
+
+                            //Clear stored login info
+                            prefs.edit().clear().apply()
+
+                            //Go to login screen
+                            startActivity(Intent(this@ProfileActivity, LoginActivity::class.java))
+                            finish()
+                        } else {
+                            val errorBody = response.errorBody()?.string()
+                            Log.e("DeleteAccount", "Raw error body: $errorBody")
+                            Toast.makeText(this@ProfileActivity, "Error deleting account", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+
+                    override fun onFailure(call: Call<ApiResponse>, t: Throwable) {
+                        Toast.makeText(this@ProfileActivity, "Error deleting account", Toast.LENGTH_SHORT).show()
+                        Log.e("DeleteAccount", "Network error", t)
+                    }
+                    
+                })
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
     }
 }

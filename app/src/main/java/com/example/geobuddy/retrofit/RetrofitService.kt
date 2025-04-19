@@ -3,6 +3,7 @@ package com.example.geobuddy.retrofit
 import com.example.geobuddy.models.Tracker
 import retrofit2.Call
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.POST
 import retrofit2.http.GET
@@ -10,6 +11,7 @@ import retrofit2.http.Query
 import retrofit2.http.Field
 import retrofit2.http.Header
 import retrofit2.http.Headers
+import retrofit2.http.PUT
 import retrofit2.http.Path
 
 interface RetrofitService {
@@ -32,50 +34,66 @@ interface RetrofitService {
     @POST("auth/signup")
     fun signUpUser(@Body request: SignupRequest): Call<SignupResponse>
 
-    //GET method to verify user details
+    //Display User Details and Delete Account
     @GET("users/me")
     fun getUserDetails(
         @Header("Authorization") authHeader: String
     ): Call<UserProfile>
 
-    @GET("users/me")
+    @DELETE("users/me")
+    fun deleteAccount(
+        @Header("Authorization") authHeader: String
+    ): Call<ApiResponse>
+
+    //Update Password
+    @GET("users/me/password")
     fun validateUser(
         @Query("mobile") mobile: String,
         @Query("email") email: String,
         @Query("oldPassword") oldPassword: String
     ): Call<ApiResponse>
 
-    //POST method to update user details
     @FormUrlEncoded
-    @POST("users/me")
+    @PUT("users/me/password")
     fun updatePassword(
+        @Header("Authorization") authHeader: String,
         @Field("mobile") mobile: String,
         @Field("newPassword") newPassword: String
     ): Call<ApiResponse>
 
+  //Register and Retrieve Trackers
     @GET("trackers")
-    fun getTrackers(@Query("userId") userId: String): Call<List<Tracker>>
+    fun getTrackers(
+        @Header("Authorization") authHeader: String
+    ): Call<List<Tracker>>
 
     //Trackers
-    @GET("trackers/{imei}")
-    fun getTrackerByImei(@Path("imei") imei: String): Call<TrackerImeiResponse>
+    @GET("trackers/data/{imei}")
+    fun getTrackerByImei(
+        @Header("Authorization") authHeader: String,
+        @Path("imei") imei: String
+    ): Call<TrackerImeiResponse>
 
-    @POST("trackers/pets")
+    @POST("trackers/pet")
     fun registerPetTracker(
-//        @Header("Authorization") token: String,
+        @Header("Authorization") token: String,
         @Body request: PetTrackerRequest
     ): Call<Void>
 
     @POST("trackers/luggage")
     fun registerLuggageTracker(
-//        @Header("Authorization") token: String,
+        @Header("Authorization") token: String,
         @Body request: LuggageTrackerRequest
     ): Call<Void>
 
-    @POST("trackers/children")
+    @POST("trackers/child")
     fun registerChildTracker(
-//        @Header("Authorization") token: String,
+        @Header("Authorization") token: String,
         @Body request: ChildTrackerRequest
     ): Call<Void>
 
+    //Tracker Count
+//    @GET("/trackers/count")
+//    fun getTrackerCount(@Header("Authorization") token: String): Call<Int>
+//
 }

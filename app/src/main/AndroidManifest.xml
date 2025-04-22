@@ -49,7 +49,7 @@
         <activity android:name=".ModifyPasswordActivity"/>
         <activity android:name=".PrivacyPolicyActivity"/>
         <activity android:name=".AboutUsActivity"/>
-
+        <activity android:name=".MoreFunctionsActivity"/>
+        <activity android:name=".TrackersViewActivity"/>
     </application>
-
 </manifest>

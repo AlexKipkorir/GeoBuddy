@@ -1,5 +1,6 @@
 package com.example.geobuddy
 
+import android.content.Intent
 import android.os.Bundle
 import android.text.InputType
 import android.widget.*
@@ -70,7 +71,11 @@ class ModifyPasswordActivity : AppCompatActivity() {
             }
 
             if (oldPassword.length !in 6..12 || newPassword.length !in 6..12 || confirmPassword.length !in 6..12) {
-                Toast.makeText(this, "Password must be between 6 and 12 characters", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    this,
+                    "Password must be between 6 and 12 characters",
+                    Toast.LENGTH_SHORT
+                ).show()
                 return@setOnClickListener
             }
 
@@ -90,16 +95,44 @@ class ModifyPasswordActivity : AppCompatActivity() {
 
             RetrofitClient.retrofitService.updatePassword("Bearer $token", changeRequest)
                 .enqueue(object : Callback<ApiResponse> {
-                    override fun onResponse(call: Call<ApiResponse>, response: Response<ApiResponse>) {
-                        if (response.isSuccessful && response.body()?.success == true) {
-                            Toast.makeText(applicationContext, "Password updated successfully", Toast.LENGTH_SHORT).show()
+                    override fun onResponse(
+                        call: Call<ApiResponse>,
+                        response: Response<ApiResponse>
+                    ) {
+                        val apiResponse = response.body()
+                        if (response.isSuccessful && apiResponse?.success == true) {
+                            Toast.makeText(
+                                applicationContext,
+                                "Password updated successfully",
+                                Toast.LENGTH_SHORT
+                            ).show()
+
+                            // Clear login info and redirect
+                            val prefs = getSharedPreferences("login_prefs", MODE_PRIVATE)
+                            prefs.edit().clear().apply()
+
+                            startActivity(
+                                Intent(
+                                    this@ModifyPasswordActivity,
+                                    LoginActivity::class.java
+                                )
+                            )
+                            finish()
+
                         } else {
-                            Toast.makeText(applicationContext, "Update failed: ${response.body()?.message ?: "Unknown error"}", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                applicationContext,
+                                "Update failed: ${apiResponse?.message ?: "Unknown error"}",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
                     }
-
                     override fun onFailure(call: Call<ApiResponse>, t: Throwable) {
-                        Toast.makeText(applicationContext, "Update error: ${t.message}", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            applicationContext,
+                            "Network error: ${t.message}",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 })
         }

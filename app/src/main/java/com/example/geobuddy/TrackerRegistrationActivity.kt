@@ -49,7 +49,7 @@ class TrackerRegistrationActivity : AppCompatActivity() {
     private lateinit var layoutFields: LinearLayout
     private lateinit var trackerNameInput: EditText
     private lateinit var imeiInput: EditText
-    private lateinit var luggageNameInput: EditText
+    private lateinit var luggageTypeInput: EditText
     private lateinit var petNameInput: EditText
     private lateinit var childNameInput: EditText
     private lateinit var petAgeInput: EditText
@@ -79,7 +79,7 @@ class TrackerRegistrationActivity : AppCompatActivity() {
         layoutFields = findViewById(R.id.layoutFields)
         trackerNameInput = findViewById(R.id.trackerNameInput)
         imeiInput = findViewById(R.id.imeiInput)
-        luggageNameInput = findViewById(R.id.luggageNameInput)
+        luggageTypeInput = findViewById(R.id.luggageTypeInput)
         petNameInput = findViewById(R.id.petNameInput)
         childNameInput = findViewById(R.id.childNameInput)
         petAgeInput = findViewById(R.id.petAgeInput)
@@ -232,13 +232,13 @@ class TrackerRegistrationActivity : AppCompatActivity() {
     private fun updateFieldsVisibility(category: String) {
         // Hide all fields first
         listOf(
-            luggageNameInput,petNameInput,childNameInput,colorInput,breedInput,
+            luggageTypeInput,petNameInput,childNameInput,colorInput,breedInput,
             petAgeInput,childAgeInput,luggageDescriptionInput,petDescriptionInput,childDescriptionInput)
             .forEach{ animateVisibility(it, false)}
         // Show relevant fields based on category
         when (category) {
             "Luggage" -> {
-                animateVisibility(luggageNameInput, true)
+                animateVisibility(luggageTypeInput, true)
                 animateVisibility(colorInput, true)
                 animateVisibility(luggageDescriptionInput, true)
             }
@@ -453,7 +453,7 @@ class TrackerRegistrationActivity : AppCompatActivity() {
                                 status = imeiData?.status ?: "Active",
                                 color = colorInput.text.toString(),
                                 description = luggageDescriptionInput.text.toString(),
-                                name = luggageNameInput.text.toString()
+                                luggageType = luggageTypeInput.text.toString()
                             )
 
                             retrofitService.registerLuggageTracker(authHeader, luggageRequest).enqueue(object : Callback<Void> {

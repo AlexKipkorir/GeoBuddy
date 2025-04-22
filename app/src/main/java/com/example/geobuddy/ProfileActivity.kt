@@ -203,7 +203,8 @@ class ProfileActivity : AppCompatActivity() {
                 
                 retrofitService.deleteAccount(authHeader).enqueue(object : Callback<ApiResponse>  {
                     override fun onResponse(call: Call<ApiResponse>, response: Response<ApiResponse>) {
-                        if (response.isSuccessful) {
+                        val apiResponse = response.body()
+                        if (response.isSuccessful && apiResponse?.success == true) {
                             Toast.makeText(this@ProfileActivity, "Account deleted successfully", Toast.LENGTH_SHORT).show()
 
                             //Clear stored login info

@@ -101,8 +101,8 @@ class ProfileActivity : AppCompatActivity() {
 
         //More function button functionality
         moreFunctionButton.setOnClickListener {
-            //Open a more options menu or settings
-        }
+            startActivity(Intent(this, MoreFunctionsActivity::class.java))
+                    }
 
      }
 

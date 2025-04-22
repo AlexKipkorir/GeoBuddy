@@ -211,11 +211,11 @@ class DashboardActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun loadTrackers() {
+        val sharedPreferences = getSharedPreferences("login_prefs", MODE_PRIVATE)
+        val token = sharedPreferences.getString("jwt_token", "") ?: ""
 
-    val sharedPreferences = getSharedPreferences("login_prefs", MODE_PRIVATE)
-    val token = sharedPreferences.getString("jwt_token", "") ?: ""
-
-        val call = RetrofitClient.retrofitService.getTrackers(token)
+        val authHeader = "Bearer $token"
+        val call = RetrofitClient.retrofitService.getTrackers(authHeader)
         call.enqueue(object : Callback<List<Tracker>> {
             override fun onResponse(call: Call<List<Tracker>>, response: Response<List<Tracker>>) {
                 if (response.isSuccessful && response.body() != null) {

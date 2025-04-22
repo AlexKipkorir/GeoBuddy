@@ -463,6 +463,7 @@ class TrackerRegistrationActivity : AppCompatActivity() {
 //                                        showToast("Luggage tracker registered")
                                         navigateToDashboard()
                                     } else {
+//                                        Log.e("LUGGAGE_ERROR", "Message: ${t.message}")
                                         showToast("Failed to register luggage tracker")
                                         resetButton()
                                     }

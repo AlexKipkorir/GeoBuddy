@@ -49,28 +49,29 @@ class SignupActivity : AppCompatActivity() {
         }
 
         //Sign Up Button Click Listener
-        signUpButton.setOnClickListener{
+        signUpButton.setOnClickListener {
             val username = usernameInput.text.toString().trim()
             val phoneNumber = phoneNoInput.text.toString().trim()
             val email = emailInput.text.toString().trim()
             val password = passwordInput.text.toString().trim()
             val confirmPassword = confirmPasswordInput.text.toString().trim()
 
-            if(username.isEmpty() || phoneNumber.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
+            if (username.isEmpty() || phoneNumber.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
                 Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-                if (password.length < 6) {
-                    Toast.makeText(this, "Password must be at least 6 characters", Toast.LENGTH_SHORT).show()
-                    return@setOnClickListener
-                }
 
-                if (password == confirmPassword) {
+            if (password.length < 6) {
+                Toast.makeText(this, "Password must be at least 6 characters", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
 
-                } else {
-                    Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT).show()
-                }
-            signUpUser(username,email, password, phoneNumber)
+            if (password != confirmPassword) {
+                Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            signUpUser(username, email, password, phoneNumber)
         }
 
         //Google Sign Up Button Click Listener
@@ -127,8 +128,10 @@ class SignupActivity : AppCompatActivity() {
 
                 if (response.isSuccessful) {
                     Toast.makeText(this@SignupActivity, "Sign up successful!", Toast.LENGTH_SHORT).show()
-                    startActivity(Intent(this@SignupActivity, OTPVerificationActivity::class.java))
-                    finish()
+                    Log.d("SIGNUP_INTENT", "Sending email to OTP screen: $email")
+                    val intent = Intent(this@SignupActivity, OTPVerificationActivity::class.java)
+                    intent.putExtra("email", email.trim())
+                    startActivity(intent)
                 } else {
                     Toast.makeText(this@SignupActivity, "Sign up failed: ${response.message()}", Toast.LENGTH_SHORT).show()
                 }

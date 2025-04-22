@@ -46,47 +46,38 @@ interface RetrofitService {
     ): Call<ApiResponse>
 
     //Update Password
-    @GET("users/me/password")
-    fun validateUser(
-        @Query("mobile") mobile: String,
-        @Query("email") email: String,
-        @Query("oldPassword") oldPassword: String
-    ): Call<ApiResponse>
-
-    @FormUrlEncoded
     @PUT("users/me/password")
     fun updatePassword(
         @Header("Authorization") authHeader: String,
-        @Field("mobile") mobile: String,
-        @Field("newPassword") newPassword: String
+        @Body changePasswordDto: ChangePassword
     ): Call<ApiResponse>
 
-  //Register and Retrieve Trackers
-    @GET("trackers")
+    //Register and Retrieve Trackers
+    @GET("users/trackers")
     fun getTrackers(
         @Header("Authorization") authHeader: String
     ): Call<List<Tracker>>
 
     //Trackers
-    @GET("trackers/data/{imei}")
+    @GET("users/trackers/data/{imei}")
     fun getTrackerByImei(
         @Header("Authorization") authHeader: String,
         @Path("imei") imei: String
     ): Call<TrackerImeiResponse>
 
-    @POST("trackers/pet")
+    @POST("users/trackers/pet")
     fun registerPetTracker(
         @Header("Authorization") token: String,
         @Body request: PetTrackerRequest
     ): Call<Void>
 
-    @POST("trackers/luggage")
+    @POST("users/trackers/luggage")
     fun registerLuggageTracker(
         @Header("Authorization") token: String,
         @Body request: LuggageTrackerRequest
     ): Call<Void>
 
-    @POST("trackers/child")
+    @POST("users/trackers/child")
     fun registerChildTracker(
         @Header("Authorization") token: String,
         @Body request: ChildTrackerRequest

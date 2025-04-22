@@ -94,7 +94,7 @@ class OTPVerificationActivity : AppCompatActivity() {
                 if (response.isSuccessful && response.body() != null)  {
                     val message = response.body()!!.message
                     Toast.makeText(this@OTPVerificationActivity, message, Toast.LENGTH_SHORT).show()
-                    startActivity(Intent(this@OTPVerificationActivity, DashboardActivity::class.java))
+                    startActivity(Intent(this@OTPVerificationActivity, LoginActivity::class.java))
                     finish()
                 } else {
                     val errorBody = response.errorBody()?.string()

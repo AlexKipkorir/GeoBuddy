@@ -9,6 +9,5 @@ data class PetTrackerRequest (
     val status: String = "active",
     val breed: String,
     val age: Int,
-    val description: String,
-    val userId: String
+    val description: String
 )

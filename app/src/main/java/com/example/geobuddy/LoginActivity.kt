@@ -108,8 +108,9 @@ class LoginActivity : AppCompatActivity() {
 
                     //Save token and expiry to shared preferences
                     val prefs = getSharedPreferences("login_prefs", MODE_PRIVATE)
+                    val rawToken = loginResponse.response.replace("Bearer ", "")
                     with(prefs.edit()) {
-                        putString("jwt_token", token)
+                        putString("jwt_token", rawToken)
                         putLong("token_expiry", System.currentTimeMillis() + expiry)
                         apply()
                     }

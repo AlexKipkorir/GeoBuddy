@@ -29,6 +29,7 @@ import com.example.geobuddy.retrofit.ChildTrackerRequest
 import com.example.geobuddy.retrofit.LuggageTrackerRequest
 import com.example.geobuddy.retrofit.PetTrackerRequest
 import com.example.geobuddy.retrofit.RetrofitClient
+import com.example.geobuddy.retrofit.RetrofitClient.retrofitService
 import com.example.geobuddy.retrofit.TrackerImeiResponse
 import com.example.geobuddy.retrofit.TrackerRequest
 import com.google.firebase.auth.FirebaseAuth
@@ -113,10 +114,8 @@ class TrackerRegistrationActivity : AppCompatActivity() {
                 statusIndicator.setTextColor(Color.RED)
                 sendNotification(this,"Registration Failed","IMEI number is required for registration")
             } else {
-                checkTrackerStatus(imei,statusIndicator)
+                registerTracker()
             }
-
-            registerTracker()
         }
 
     }
@@ -179,21 +178,6 @@ class TrackerRegistrationActivity : AppCompatActivity() {
         }
     }
 
-    // Function to check the status of the tracker
-    private fun checkTrackerStatus(imei: String, statusIndicator: TextView) {
-
-
-        // Simulate status check (In reality, you'd query the database)
-        if (imei == "123456789012345") {
-            statusIndicator.text = "Status: Active"
-            statusIndicator.setTextColor(Color.GREEN)
-            sendNotification(this,"Registration Successful","Tracker registered successfully")
-        } else {
-            statusIndicator.text = "Status: Inactive"
-            statusIndicator.setTextColor(Color.RED)
-            sendNotification(this,"Registration Failed","Invalid IMEI number")
-        }
-    }
 
     // Function to set up the category selection
     private fun setupCategorySelection() {
@@ -303,65 +287,33 @@ class TrackerRegistrationActivity : AppCompatActivity() {
     private fun registerTracker() {
         Log.d("TrackerRegistrationActivity", "Function called: registerTracker")
 
-        val userId = auth.currentUser?.uid ?: return
-        Log.d("TrackerRegistrationActivity", "User ID retrieved: $userId")
+        val prefs = getSharedPreferences("login_prefs", MODE_PRIVATE)
+        val token = prefs.getString("jwt_token", "") ?: ""
+
+        if (token.isEmpty()) {
+            Toast.makeText(this, "Authentication token not found. Please log in again.", Toast.LENGTH_SHORT).show()
+            startActivity(Intent(this, LoginActivity::class.java))
+            finish()
+            return
+        }
 
         val trackerName = trackerNameInput.text.toString().trim()
         val imei = imeiInput.text.toString().trim()
         val category = categorySpinner.selectedItem.toString().trim()
 
-        if (trackerName.isEmpty() || imei.isEmpty() || category.isEmpty()) {
-            Log.e("TrackerRegistrationActivity", "Validation failed: Missing fields")
+        if (trackerName.isEmpty() || imei.isEmpty() || category == "Select Category") {
             Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show()
             return
         }
-        Log.d("TrackerRegistrationActivity", "Checking if user has reached max trackers limit")
 
-        val maxTrackersAllowed = 5
-        db.collection("trackers").whereEqualTo("userId", userId).get()
-            .addOnSuccessListener { documents ->
-                Log.d("TrackerRegistrationActivity", "Tracker count retrieved: ${documents.size()}")
+        val authHeader = "Bearer $token"
 
-                if (documents.size() >= maxTrackersAllowed) {
-                    Log.e("TrackerRegistrationActivity", "Maximum trackers reached")
-                    Toast.makeText(this, "Maximum trackers reached", Toast.LENGTH_SHORT).show()
-                    sendNotification(this,"Registration Failed","Maximum trackers reached")
-                    return@addOnSuccessListener
-                }
-
-                imageUri?.let { uri: Uri ->
-                    Log.d("TrackerRegistrationActivity", "Uploading image...")
-
-                    val imageRef = storage.child("tracker_images/${UUID.randomUUID()}.jpg")
-                    imageRef.putFile(uri)
-                        .addOnSuccessListener { _ ->
-                            Log.d("TrackerRegistrationActivity", "Image uploaded successfully")
-
-                            imageRef.downloadUrl.addOnSuccessListener { imageUrl ->
-                                Log.d("TrackerRegistrationActivity", "Image URL retrieved: $imageUrl")
-//                                saveTrackerToFirestore(userId, trackerName, imei, category, imageUrl.toString())
-                                saveTrackerToBackend(userId, trackerName, imei, category, imageUrl.toString())
-                            }
-                        }
-                        .addOnFailureListener { e ->
-                            Log.e("TrackerRegistrationActivity", "Failed to upload image", e)
-                            Toast.makeText(this, "Failed to upload image", Toast.LENGTH_SHORT).show()
-                        }
-
-                } ?: run{
-                    Log.d("TrackerRegistrationActivity", "No image selected, saving tracker without image")
-//                    saveTrackerToFirestore(userId, trackerName, imei, category, null)
-                    saveTrackerToBackend(userId, trackerName, imei, category, null)
-
-                }
-
-            }
-            .addOnFailureListener { e ->
-                Log.e("TrackerRegistrationActivity", "Failed to retrieve tracker count", e)
-            }
-
-
+        // Directly proceed to save tracker
+        saveTrackerToBackend(authHeader, trackerName, imei, category)
     }
+
+
+
     // Save tracker to Firestore
 //    private fun saveTrackerToFirestore(userId: String, trackerName: String, imei: String, category: String, imageUrl: String?) {
 //        Log.d("TrackerRegistrationActivity", "Function called: saveTrackerToFirestore")
@@ -397,22 +349,29 @@ class TrackerRegistrationActivity : AppCompatActivity() {
 //
 //    }
     //Retrofit
-    private fun saveTrackerToBackend(userId: String, trackerName: String, imei: String, category: String, imageUrl: String?){
+    private fun saveTrackerToBackend(token: String, trackerName: String, imei: String, category: String) {
         val retrofitService = RetrofitClient.retrofitService
-//        val prefs = getSharedPreferences("login_prefs", MODE_PRIVATE)
-//        val token = prefs.getString("jwt_token", "") ?: ""
+        val authHeader = if (token.startsWith("Bearer ")) token else "Bearer $token"
+
+
+        Log.d("TOKEN_CHECK", "Retrieved token: '$token'")
 
         registerTrackerButton.isEnabled = false
         registerTrackerButton.setText(R.string.registering)
 
-        //Check if IMEI exists
-        retrofitService.getTrackerByImei(imei).enqueue(object : Callback<TrackerImeiResponse> {
+        // Check if IMEI exists
+        retrofitService.getTrackerByImei(authHeader, imei).enqueue(object : Callback<TrackerImeiResponse> {
             override fun onResponse(call: Call<TrackerImeiResponse>, response: Response<TrackerImeiResponse>) {
-                if (response.isSuccessful && response.body() == null) {
-                    Log.d("IMEI_CHECK", "IMEI exists. Proceed with $category tracker registration.")
-                    val imeiData = response.body()
+                Log.d("IMEI_CHECK", "Response Code: ${response.code()}")
+                Log.d("IMEI_CHECK", "Response Body: ${response.body()}")
+                Log.d("IMEI_CHECK", "Error Body: ${response.errorBody()?.string()}")
 
-                    Log.d("IMEI_RESPONSE", "Data: $imeiData")
+                if (response.isSuccessful && response.body() != null) {
+                    val imeiData = response.body()
+                    Log.d("IMEI_CHECK", "Valid IMEI: $imeiData")
+
+                    statusIndicator.text = "Status: Active"
+                    statusIndicator.setTextColor(Color.GREEN)
 
                     when (category.lowercase()) {
                         "pet" -> {
@@ -425,34 +384,33 @@ class TrackerRegistrationActivity : AppCompatActivity() {
                                 status = imeiData?.status ?: "Active",
                                 breed = breedInput.text.toString(),
                                 age = petAgeInput.text.toString().toIntOrNull() ?: 0,
-                                description = petDescriptionInput.text.toString(),
-                                userId = userId
+                                description = petDescriptionInput.text.toString()
                             )
+
                             Log.d("REGISTER_PET", "Sending pet tracker request: $petRequest")
 
-                            retrofitService.registerPetTracker( petRequest)
-                                .enqueue(object : Callback<Void> {
-                                    override fun onResponse(call: Call<Void>, response: Response<Void>) {
-                                        Log.d("REGISTER_PET", "Response code: ${response.code()}")
-                                        if (response.isSuccessful) {
-                                            Log.d("REGISTER_PET", "Pet tracker registered successfully")
-                                            showToast("Pet tracker registered successfully")
-                                            navigateToDashboard()
-                                        } else {
-                                            val errorBody = response.errorBody()?.string()
-                                            Log.e("REGISTER_PET", "Failed to register pet tracker. Code: ${response.code()}, Error: $errorBody")
+                            retrofitService.registerPetTracker(authHeader, petRequest).enqueue(object : Callback<Void> {
+                                override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                                    if (response.isSuccessful) {
+                                        sendNotification(this@TrackerRegistrationActivity, "Registration Successful", "Pet tracker registered successfully")
+//                                        showToast("Pet tracker registered successfully")
+                                        navigateToDashboard()
+                                    } else {
+                                        val error = response.errorBody()?.string()
+                                        Log.e("REGISTER_PET", "Error: $error")
+                                        showToast("Failed to register pet tracker")
+                                        resetButton()
+                                    }
+                                }
 
-                                            registerTrackerButton.isEnabled = true
-                                            registerTrackerButton.setText(R.string.register_tracker)
-                                                showToast("Failed to register pet tracker")
-                                        }
-                                    }
-                                    override fun onFailure(call: Call<Void>, t: Throwable) {
-                                        Log.e("REGISTER_PET", "Network failure during pet tracker registration", t)
-                                        showToast("Failed to register pet tracker: ${t.message}")
-                                    }
-                                })
+                                override fun onFailure(call: Call<Void>, t: Throwable) {
+                                    Log.e("REGISTER_PET", "Network error: ${t.message}", t)
+                                    showToast("Failed to register pet tracker: ${t.message}")
+                                    resetButton()
+                                }
+                            })
                         }
+
                         "child" -> {
                             val childRequest = ChildTrackerRequest(
                                 trackerName = trackerName,
@@ -463,26 +421,28 @@ class TrackerRegistrationActivity : AppCompatActivity() {
                                 status = imeiData?.status ?: "Active",
                                 age = childAgeInput.text.toString().toIntOrNull() ?: 0,
                                 description = childDescriptionInput.text.toString(),
-                                name = childNameInput.text.toString(),
-                                userId = userId
+                                name = childNameInput.text.toString()
                             )
-                            retrofitService.registerChildTracker(childRequest)
-                                .enqueue(object : Callback<Void> {
-                                    override fun onResponse(call: Call<Void>, response: Response<Void>) {
-                                        if (response.isSuccessful) {
-                                            showToast("Child tracker registered")
-                                            navigateToDashboard()
-                                        } else {
-                                            registerTrackerButton.isEnabled = true
-                                            registerTrackerButton.setText(R.string.register_tracker)
-                                            showToast("Failed to register child tracker")
-                                        }
+
+                            retrofitService.registerChildTracker(authHeader, childRequest).enqueue(object : Callback<Void> {
+                                override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                                    if (response.isSuccessful) {
+                                        sendNotification(this@TrackerRegistrationActivity, "Registration Successful", "Child tracker registered successfully")
+//                                        showToast("Child tracker registered")
+                                        navigateToDashboard()
+                                    } else {
+                                        showToast("Failed to register child tracker")
+                                        resetButton()
                                     }
-                                    override fun onFailure(call: Call<Void>, t: Throwable) {
-                                        showToast("Error saving child tracker: ${t.message}")
-                                    }
-                                })
+                                }
+
+                                override fun onFailure(call: Call<Void>, t: Throwable) {
+                                    showToast("Error saving child tracker: ${t.message}")
+                                    resetButton()
+                                }
+                            })
                         }
+
                         "luggage" -> {
                             val luggageRequest = LuggageTrackerRequest(
                                 trackerName = trackerName,
@@ -493,40 +453,52 @@ class TrackerRegistrationActivity : AppCompatActivity() {
                                 status = imeiData?.status ?: "Active",
                                 color = colorInput.text.toString(),
                                 description = luggageDescriptionInput.text.toString(),
-                                name = luggageNameInput.text.toString(),
-                                userId = userId
+                                name = luggageNameInput.text.toString()
                             )
-                            retrofitService.registerLuggageTracker(luggageRequest)
-                                .enqueue(object : Callback<Void> {
-                                    override fun onResponse(call: Call<Void>, response: Response<Void>) {
-                                      if(response.isSuccessful) {
-                                          showToast("Luggage tracker registered")
-                                          navigateToDashboard()
-                                      } else {
-                                          registerTrackerButton.isEnabled = true
-                                          registerTrackerButton.setText(R.string.register_tracker)
-                                          showToast("Failed to register luggage tracker")
-                                      }
-                                    }
-                                    override fun onFailure(call: Call<Void>, t: Throwable) {
-                                        showToast("Error saving luggage tracker: ${t.message}")
-                                    }
-                                })
-                        }
 
+                            retrofitService.registerLuggageTracker(authHeader, luggageRequest).enqueue(object : Callback<Void> {
+                                override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                                    if (response.isSuccessful) {
+                                        sendNotification(this@TrackerRegistrationActivity, "Registration Successful", "Luggage tracker registered successfully")
+//                                        showToast("Luggage tracker registered")
+                                        navigateToDashboard()
+                                    } else {
+                                        showToast("Failed to register luggage tracker")
+                                        resetButton()
+                                    }
+                                }
+
+                                override fun onFailure(call: Call<Void>, t: Throwable) {
+                                    showToast("Error saving luggage tracker: ${t.message}")
+                                    resetButton()
+                                }
+                            })
+                        }
                     }
+
                 } else {
-                    showToast("IMEI not found. Please check the device registration.")
+                    statusIndicator.text = "Status: Inactive"
+                    statusIndicator.setTextColor(Color.RED)
+                    registerTrackerButton.isEnabled = true
+                    registerTrackerButton.setText(R.string.register_tracker)
+                    sendNotification(this@TrackerRegistrationActivity, "Registration Failed", "Invalid IMEI number")
                 }
             }
 
             override fun onFailure(call: Call<TrackerImeiResponse>, t: Throwable) {
-               showToast("Failed to verify IMEI: ${t.message}")
+                showToast("Failed to verify IMEI: ${t.message}")
                 Log.e("IMEI_FETCH_ERROR", "Message: ${t.message}")
+                resetButton()
             }
-
         })
     }
+
+    // Helper to reset button state
+    private fun resetButton() {
+        registerTrackerButton.isEnabled = true
+        registerTrackerButton.setText(R.string.register_tracker)
+    }
+
 
 
     // Show Toast

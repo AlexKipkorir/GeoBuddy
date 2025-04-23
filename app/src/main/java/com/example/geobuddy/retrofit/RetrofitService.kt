@@ -53,7 +53,7 @@ interface RetrofitService {
     ): Call<ApiResponse>
 
     //Register and Retrieve Trackers
-    @GET("users/trackers")
+    @GET("users/trackers/my")
     fun getTrackers(
         @Header("Authorization") authHeader: String
     ): Call<List<Tracker>>

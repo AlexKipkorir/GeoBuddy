@@ -2,33 +2,36 @@ package com.example.geobuddy
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.widget.Button
 import android.widget.Switch
-import android.widget.Toast
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
+import com.google.android.datatransport.BuildConfig
+import androidx.core.content.edit
 
 class MoreFunctionsActivity : AppCompatActivity() {
+
     @SuppressLint("UseSwitchCompatOrMaterialCode")
+    private lateinit var darkModeSwitch: Switch
+    private lateinit var prefs: SharedPreferences
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.more_functions_activity)
+        setContentView(R.layout.activity_more_functions)
 
-        val viewTrackersButton = findViewById<Button>(R.id.viewTrackersButton)
-        val darkModeSwitch = findViewById<Switch>(R.id.darkModeSwitch)
-        val notificationsSwitch = findViewById<Switch>(R.id.notificationsSwitch)
+        val switchPush = findViewById<Switch>(R.id.switchPushNotifications)
+        val switchEmail = findViewById<Switch>(R.id.switchEmailAlerts)
 
-        viewTrackersButton.setOnClickListener {
-            val intent = Intent(this, TrackersViewActivity::class.java)
-            startActivity(intent)
+        findViewById<Button>(R.id.ViewTrackersButton).setOnClickListener {
+            startActivity(Intent(this, TrackersViewActivity::class.java))
         }
 
-        darkModeSwitch.setOnCheckedChangeListener { _, isChecked ->
-            Toast.makeText(this, "Dark mode: $isChecked", Toast.LENGTH_SHORT).show()
+        findViewById<Button>(R.id.btnTerms).setOnClickListener {
+            startActivity(Intent(this, TermsofServiceActivity::class.java))
         }
-
-        notificationsSwitch.setOnCheckedChangeListener { _, isChecked ->
-            Toast.makeText(this, "Notifications: $isChecked", Toast.LENGTH_SHORT).show()
-        }
+        findViewById<TextView>(R.id.txtAppVersion).text = "App Version: ${BuildConfig.VERSION_NAME}"
     }
 }

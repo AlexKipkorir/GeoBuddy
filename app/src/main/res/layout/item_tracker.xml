@@ -1,0 +1,27 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    android:background="@drawable/dash_spinner"
+    android:orientation="vertical"
+    android:padding="12dp">
+
+    <TextView
+        android:id="@+id/trackerName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawablePadding="8dp"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <LinearLayout
+        android:id="@+id/expandedLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/card_bg"
+        android:backgroundTint="@android:color/white"
+        android:orientation="vertical"
+        android:padding="8dp"
+        android:visibility="gone" />
+</LinearLayout>

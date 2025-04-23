@@ -1,0 +1,90 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    >
+
+    <!-- Page Title -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:text="@string/more_functions"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="16dp"
+        />
+
+    <!-- View Trackers Button -->
+    <Button
+        android:id="@+id/ViewTrackersButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/view_trackers"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/background_gradient"/>
+
+    <!-- Section Header -->
+    <TextView
+        android:id="@+id/notificationSettingsTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/notification_settings"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_marginTop="24dp"
+        android:layout_marginBottom="8dp" />
+
+    <!-- Notification Toggles -->
+    <Switch
+        android:id="@+id/switchPushNotifications"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Enable Push Notifications"
+        android:padding="8dp" />
+
+    <Switch
+        android:id="@+id/switchEmailAlerts"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Enable Email Alerts"
+        android:padding="8dp" />
+
+    <!-- Dark Mode -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Appearance"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_marginTop="24dp"
+        android:layout_marginBottom="8dp" />
+
+    <Switch
+        android:id="@+id/switchDarkMode"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:text="Dark Mode" />
+
+    <!-- Terms of Service -->
+    <Button
+        android:id="@+id/btnTerms"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Terms of Service"
+        android:layout_marginTop="24dp"
+        android:background="@drawable/background_gradient"/>
+
+    <!-- App Version -->
+    <TextView
+        android:id="@+id/txtAppVersion"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="App Version: 1.0"
+        android:layout_marginTop="16dp" />
+
+</LinearLayout>

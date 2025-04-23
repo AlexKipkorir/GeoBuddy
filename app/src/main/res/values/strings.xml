@@ -126,4 +126,8 @@
     <string name="street_view">Street View</string>
     <string name="app_version">App Version: 1.0.0</string>
     <string name="registering">registering</string>
+    <string name="terms_of_service">Terms of Service</string>
+    <string name="dark_mode">Dark Mode</string>
+    <string name="notification_settings">Notification Settings</string>
+    <string name="more_functions">More Functions</string>
 </resources>

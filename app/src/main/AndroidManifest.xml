@@ -26,7 +26,7 @@
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyCoMR_pQIOWLH6zhipzFkNcn22TUT_yXJ4" />
+            android:value="${MAPS_API_KEY}" />
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -51,5 +51,6 @@
         <activity android:name=".AboutUsActivity"/>
         <activity android:name=".MoreFunctionsActivity"/>
         <activity android:name=".TrackersViewActivity"/>
+        <activity android:name=".TermsofServiceActivity"/>
     </application>
 </manifest>

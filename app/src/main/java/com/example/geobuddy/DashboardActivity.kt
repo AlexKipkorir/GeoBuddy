@@ -65,53 +65,43 @@ class DashboardActivity : AppCompatActivity(), OnMapReadyCallback {
 
     //Dashboard Functionality
     override fun onCreate(savedInstanceState: Bundle?) {
-
-
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_dashboard)
 
-
-
-//        if (token.isEmpty()) {
-//            Toast.makeText(this, "Token not found. Please log in again.", Toast.LENGTH_SHORT).show()
-//            startActivity(Intent(this, LoginActivity::class.java))
-//            finish()
-//            return
-//        }
-
         addTrackerButton = findViewById(R.id.addTrackerButton)
         profileButton = findViewById(R.id.profileButton)
-
+        trackerSpinner = findViewById(R.id.trackerSpinner)
 
         auth = FirebaseAuth.getInstance()
         db = FirebaseFirestore.getInstance()
 
-        // Navigate To Tracker Registration Page
+        // init tracker registration button
         addTrackerButton.setOnClickListener {
             val intent = Intent(this, TrackerRegistrationActivity::class.java)
             startActivity(intent)
         }
 
-        //Profile Button init
+        // init profile button
         profileButton.setOnClickListener{
             val intent = Intent(this, ProfileActivity::class.java)
             startActivity(intent)
         }
 
-        // Initialize FusedLocationProviderClient
+        // init FusedLocationProviderClient
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
-        // Initialize Map
+        // init Map
         val mapFragment = supportFragmentManager.findFragmentById(R.id.mapFragment) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
+        // init google maps route to tracker
         val routeButton = findViewById<ImageButton>(R.id.routeButton)
         routeButton.setOnClickListener {
             // Get the currently selected tracker from the spinner
             val pos = trackerSpinner.selectedItemPosition
             if (pos != AdapterView.INVALID_POSITION && trackerList.isNotEmpty()) {
                 val tracker = trackerList[pos]
-                // Create an intent to launch Google Maps to the tracker's location
+                // launch Google Maps to the tracker's location
                 val uri = "google.navigation:q=${tracker.latitude},${tracker.longitude}".toUri()
                 val intent = Intent(Intent.ACTION_VIEW, uri)
                 intent.setPackage("com.google.android.apps.maps")
@@ -121,12 +111,13 @@ class DashboardActivity : AppCompatActivity(), OnMapReadyCallback {
             }
         }
 
+        // init google maps street view to see tracker surroundings
         val streetViewButton = findViewById<ImageButton>(R.id.streetViewButton)
         streetViewButton.setOnClickListener {
             val pos = trackerSpinner.selectedItemPosition
             if (pos != AdapterView.INVALID_POSITION && trackerList.isNotEmpty()) {
                 val tracker = trackerList[pos]
-                // Create an intent to launch Street View to the tracker's location
+                // launch Street View to the tracker's location
                 val uri = "google.streetview:cbll=${tracker.latitude},${tracker.longitude}".toUri()
                 val intent = Intent(Intent.ACTION_VIEW, uri)
                 intent.setPackage("com.google.android.apps.maps")
@@ -135,13 +126,11 @@ class DashboardActivity : AppCompatActivity(), OnMapReadyCallback {
                 }
             }
         }
-        // Set up tracker dropdown
-        trackerSpinner = findViewById(R.id.trackerSpinner)
     }
 
     //Map functionality
     override fun onMapReady(map: GoogleMap) {
-        Log.d("DashboardActivity", "onMapReady called")
+
         googleMap = map
         googleMap.uiSettings.isZoomControlsEnabled = true
         googleMap.uiSettings.isMyLocationButtonEnabled = false
@@ -160,12 +149,10 @@ class DashboardActivity : AppCompatActivity(), OnMapReadyCallback {
                 viewDetails.text = "View Details"
                 return view
             }
-
             override fun getInfoWindow(marker: Marker): View? {
                 return null
             }
         })
-
         map.setOnInfoWindowClickListener { marker ->
             val trackerName = marker.title
             val details = marker.snippet
@@ -199,7 +186,6 @@ class DashboardActivity : AppCompatActivity(), OnMapReadyCallback {
             Log.e("DashboardActivity", "Google Map is not initialized.")
             return
         }
-
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
                 location?.let {
@@ -232,7 +218,7 @@ class DashboardActivity : AppCompatActivity(), OnMapReadyCallback {
                         val markerOptions = MarkerOptions()
                             .position(position)
                             .title(tracker.trackerName)
-                            .snippet("Status: ${tracker.status}, Battery: ${tracker.battery}")
+                            .snippet("Status: ${tracker.status}, Battery: ${tracker.batteryCapacity}")
                             .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
                         googleMap.addMarker(markerOptions)
 

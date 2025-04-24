@@ -3,7 +3,8 @@
     android:orientation="vertical"
     android:padding="8dp"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:background="@drawable/card_bg">
 
     <TextView
         android:id="@+id/title"
@@ -19,8 +20,7 @@
         android:id="@+id/snippet"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:textAlignment="center"
+        android:gravity="start"
         />
 
     <Button

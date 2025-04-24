@@ -1,8 +1,8 @@
 package com.example.geobuddy
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.AlertDialog
-import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
@@ -25,21 +25,14 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.drawable.Drawable
-import android.net.Uri
 import android.util.Log
 import android.view.LayoutInflater
 import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
 import com.example.geobuddy.models.Tracker
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
 import androidx.core.net.toUri
 import com.example.geobuddy.retrofit.RetrofitClient
-import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.Marker
 import retrofit2.Call
 import retrofit2.Callback
@@ -55,8 +48,6 @@ class DashboardActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var addTrackerButton: FloatingActionButton
     private lateinit var profileButton: ImageView
     private val trackerList = mutableListOf<Tracker>()
-    private lateinit var auth: FirebaseAuth
-    private lateinit var db: FirebaseFirestore
 
 
     companion object {
@@ -72,8 +63,6 @@ class DashboardActivity : AppCompatActivity(), OnMapReadyCallback {
         profileButton = findViewById(R.id.profileButton)
         trackerSpinner = findViewById(R.id.trackerSpinner)
 
-        auth = FirebaseAuth.getInstance()
-        db = FirebaseFirestore.getInstance()
 
         // init tracker registration button
         addTrackerButton.setOnClickListener {
@@ -138,12 +127,12 @@ class DashboardActivity : AppCompatActivity(), OnMapReadyCallback {
         loadTrackers()
 
         map.setInfoWindowAdapter(object : GoogleMap.InfoWindowAdapter {
+            @SuppressLint("SetTextI18n", "InflateParams")
             override fun getInfoContents(marker: Marker): View? {
                 val view = LayoutInflater.from(this@DashboardActivity).inflate(R.layout.info_window, null)
                 val title = view.findViewById<TextView>(R.id.title)
                 val snippet = view.findViewById<TextView>(R.id.snippet)
                 val viewDetails = view.findViewById<TextView>(R.id.detailsButton)
-
                 title.text = marker.title
                 snippet.text = marker.snippet
                 viewDetails.text = "View Details"
@@ -158,16 +147,9 @@ class DashboardActivity : AppCompatActivity(), OnMapReadyCallback {
             val details = marker.snippet
             AlertDialog.Builder(this@DashboardActivity)
                 .setTitle("Details for $trackerName")
-                .setMessage("Full info:\n$details\n")
+                .setMessage("Info:\n$details\n")
                 .setPositiveButton("OK", null)
                 .show()
-        }
-        // Check for location permission
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            googleMap.isMyLocationEnabled = true
-            findUserLocation()
-        } else {
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_PERMISSION_REQUEST_CODE)
         }
         // Find Me Button
         findMeButton = findViewById(R.id.findMeButton)
@@ -210,7 +192,6 @@ class DashboardActivity : AppCompatActivity(), OnMapReadyCallback {
                     googleMap.clear()
 
                     val spinnerItems = mutableListOf<String>()
-
                     for (tracker in trackers) {
                         trackerList.add(tracker)
 
@@ -218,7 +199,14 @@ class DashboardActivity : AppCompatActivity(), OnMapReadyCallback {
                         val markerOptions = MarkerOptions()
                             .position(position)
                             .title(tracker.trackerName)
-                            .snippet("Status: ${tracker.status}, Battery: ${tracker.batteryCapacity}")
+                            .snippet("status")
+                            .snippet(buildString {
+                                append("Status: ${tracker.status}\n")
+                                append("Battery: ${tracker.batteryCapacity}\n")
+                                tracker.age?.let { append("Age: $it\n") }
+                                append("Description: ${tracker.description}\n")
+                                append("Date Created: ${tracker.timestamp}\n")
+                            })
                             .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
                         googleMap.addMarker(markerOptions)
 
@@ -232,7 +220,7 @@ class DashboardActivity : AppCompatActivity(), OnMapReadyCallback {
                         override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                             val selectedTracker = trackerList[position]
                             val targetPos = LatLng(selectedTracker.latitude, selectedTracker.longitude)
-                            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(targetPos, 14f))
+                            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(targetPos, 16f))
                         }
 
                         override fun onNothingSelected(parent: AdapterView<*>?) {}
@@ -248,72 +236,4 @@ class DashboardActivity : AppCompatActivity(), OnMapReadyCallback {
             }
         })
     }
-
-//    private fun loadTrackers() {
-//        val userId = auth.currentUser?.uid ?: return
-//
-//        // Query the "trackers" collection for documents with matching userId.
-//        db.collection("trackers")
-//            .whereEqualTo("userId", userId)
-//            .get()
-//            .addOnSuccessListener { querySnapshot ->
-//                // Clear any previous markers and tracker list
-//                googleMap.clear()
-//                trackerList.clear()
-//
-//                // Prepare a list for spinner display strings
-//                val spinnerItems = mutableListOf<String>()
-//
-//                for (document in querySnapshot) {
-//                    // Retrieve fields from the document
-//                    val name = document.getString("trackerName") ?: "Unknown Tracker"
-//                    val status = document.getString("trackerStatus") ?: "Unknown"
-//                    val battery = document.getString("battery") ?: "N/A"
-//                    val lat = document.getDouble("latitude") ?: 0.0
-//                    val lng = document.getDouble("longitude") ?: 0.0
-//
-//                    // Create a Tracker instance
-//                    val tracker = Tracker(name, status, battery, lat, lng)
-//                    trackerList.add(tracker)
-//
-//                    // Plot a marker on the map for each tracker
-//                    val position = LatLng(lat, lng)
-//                    val markerOptions = MarkerOptions()
-//                        .position(position)
-//                        .title(name)
-//                        .snippet("Status: $status, Battery: $battery")
-//                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
-//                    googleMap.addMarker(markerOptions)
-//
-//                    // Prepare spinner item text
-//                    spinnerItems.add("$name - $status")
-//                }
-//
-//                // Set up the spinner adapter with tracker names and statuses
-//                val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, spinnerItems)
-//                trackerSpinner.adapter = adapter
-//
-//                // Set spinner listener to move the map camera to the selected tracker.
-//                trackerSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-//                    override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-//                        // Retrieve the selected tracker and animate the camera to its location.
-//                        val selectedTracker = trackerList[position]
-//                        val targetPos = LatLng(selectedTracker.latitude, selectedTracker.longitude)
-//                        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(targetPos, 14f))
-//                    }
-//
-//                    override fun onNothingSelected(parent: AdapterView<*>?) {
-//                        // No action needed
-//                    }
-//                }
-//
-//                if (trackerList.isNotEmpty()) {
-//                    val firstTracker = trackerList[0]
-//                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(firstTracker.latitude, firstTracker.longitude), 12f))
-//                }
-//            }
-//            .addOnFailureListener { exception ->
-//                Log.e("MainActivity", "Error fetching trackers: ", exception)
-//            }
-//    }
 }

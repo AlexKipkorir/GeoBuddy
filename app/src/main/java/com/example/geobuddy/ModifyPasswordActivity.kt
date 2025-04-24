@@ -7,6 +7,7 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.example.geobuddy.retrofit.ApiResponse
 import com.example.geobuddy.retrofit.ChangePassword
+import com.example.geobuddy.retrofit.MessageResponse
 import com.example.geobuddy.retrofit.RetrofitClient
 import retrofit2.Call
 import retrofit2.Callback
@@ -94,13 +95,13 @@ class ModifyPasswordActivity : AppCompatActivity() {
             )
 
             RetrofitClient.retrofitService.updatePassword("Bearer $token", changeRequest)
-                .enqueue(object : Callback<ApiResponse> {
+                .enqueue(object : Callback<MessageResponse> {
                     override fun onResponse(
-                        call: Call<ApiResponse>,
-                        response: Response<ApiResponse>
+                        call: Call<MessageResponse>,
+                        response: Response<MessageResponse>
                     ) {
                         val apiResponse = response.body()
-                        if (response.isSuccessful && apiResponse?.success == true) {
+                        if (response.isSuccessful && response.body() != null) {
                             Toast.makeText(
                                 applicationContext,
                                 "Password updated successfully",
@@ -127,7 +128,7 @@ class ModifyPasswordActivity : AppCompatActivity() {
                             ).show()
                         }
                     }
-                    override fun onFailure(call: Call<ApiResponse>, t: Throwable) {
+                    override fun onFailure(call: Call<MessageResponse>, t: Throwable) {
                         Toast.makeText(
                             applicationContext,
                             "Network error: ${t.message}",

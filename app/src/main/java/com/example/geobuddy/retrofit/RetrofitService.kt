@@ -40,14 +40,14 @@ interface RetrofitService {
     @DELETE("users/me")
     fun deleteAccount(
         @Header("Authorization") authHeader: String
-    ): Call<ApiResponse>
+    ): Call<MessageResponse>
 
     //Update Password
     @PUT("users/me/password")
     fun updatePassword(
         @Header("Authorization") authHeader: String,
         @Body changePasswordDto: ChangePassword
-    ): Call<ApiResponse>
+    ): Call<MessageResponse>
 
     //Register and Retrieve Trackers
     @GET("users/trackers/my")

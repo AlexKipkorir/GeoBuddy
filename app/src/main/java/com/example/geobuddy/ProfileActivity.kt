@@ -17,6 +17,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import androidx.appcompat.app.AlertDialog
+import com.example.geobuddy.retrofit.MessageResponse
 
 
 import com.example.geobuddy.retrofit.UserProfile
@@ -201,10 +202,10 @@ class ProfileActivity : AppCompatActivity() {
                 val retrofitService = RetrofitClient.retrofitService
                 val authHeader = "Bearer $token"
                 
-                retrofitService.deleteAccount(authHeader).enqueue(object : Callback<ApiResponse>  {
-                    override fun onResponse(call: Call<ApiResponse>, response: Response<ApiResponse>) {
+                retrofitService.deleteAccount(authHeader).enqueue(object : Callback<MessageResponse>  {
+                    override fun onResponse(call: Call<MessageResponse>, response: Response<MessageResponse>) {
                         val apiResponse = response.body()
-                        if (response.isSuccessful && apiResponse?.success == true) {
+                        if (response.isSuccessful && response.body() != null) {
                             Toast.makeText(this@ProfileActivity, "Account deleted successfully", Toast.LENGTH_SHORT).show()
 
                             //Clear stored login info
@@ -220,7 +221,7 @@ class ProfileActivity : AppCompatActivity() {
                         }
                     }
 
-                    override fun onFailure(call: Call<ApiResponse>, t: Throwable) {
+                    override fun onFailure(call: Call<MessageResponse>, t: Throwable) {
                         Toast.makeText(this@ProfileActivity, "Error deleting account", Toast.LENGTH_SHORT).show()
                         Log.e("DeleteAccount", "Network error", t)
                     }

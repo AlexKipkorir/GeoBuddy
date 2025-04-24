@@ -4,11 +4,8 @@ import com.example.geobuddy.models.Tracker
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.DELETE
-import retrofit2.http.FormUrlEncoded
 import retrofit2.http.POST
 import retrofit2.http.GET
-import retrofit2.http.Query
-import retrofit2.http.Field
 import retrofit2.http.Header
 import retrofit2.http.Headers
 import retrofit2.http.PUT
@@ -43,14 +40,14 @@ interface RetrofitService {
     @DELETE("users/me")
     fun deleteAccount(
         @Header("Authorization") authHeader: String
-    ): Call<ApiResponse>
+    ): Call<MessageResponse>
 
     //Update Password
     @PUT("users/me/password")
     fun updatePassword(
         @Header("Authorization") authHeader: String,
         @Body changePasswordDto: ChangePassword
-    ): Call<ApiResponse>
+    ): Call<MessageResponse>
 
     //Register and Retrieve Trackers
     @GET("users/trackers/my")

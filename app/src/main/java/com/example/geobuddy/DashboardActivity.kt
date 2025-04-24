@@ -151,6 +151,13 @@ class DashboardActivity : AppCompatActivity(), OnMapReadyCallback {
                 .setPositiveButton("OK", null)
                 .show()
         }
+        // Check for location permission
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            googleMap.isMyLocationEnabled = true
+            findUserLocation()
+        } else {
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_PERMISSION_REQUEST_CODE)
+        }
         // Find Me Button
         findMeButton = findViewById(R.id.findMeButton)
         findMeButton.setOnClickListener {
@@ -172,7 +179,7 @@ class DashboardActivity : AppCompatActivity(), OnMapReadyCallback {
             fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
                 location?.let {
                     val userLatLng = LatLng(it.latitude, it.longitude)
-                    googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(userLatLng, 15f))
+                    googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(userLatLng, 16f))
                 }
             }
         }
